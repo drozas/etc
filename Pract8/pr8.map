@@ -1,0 +1,162 @@
+
+
+
+Filename : PR8.OBJ
+
+Global Symbol Name             Global Value
+
+BEGIN                             001040
+CONST                             001000
+N                                 000010
+TAM_ELEM                          000004
+VAR                               001000
+VECTOR                            001000
+
+
+
+Filename : ORDENAR.OBJ
+
+Global Symbol Name             Global Value
+
+FINFOR1                           0010D8
+FINFOR2                           0010D4
+FOR1                              00109A
+FOR2                              0010AC
+NOINTER                           0010C4
+ORD_VECT                          00108E
+
+
+
+Filename : INOUT_V1.OBJ
+
+Global Symbol Name             Global Value
+
+DefineEcho                        00117A
+KeyPressed                        001186
+ReadBool                          001206
+ReadByte                          0011F8
+ReadChar                          0011A4
+ReadInt                           0011C0
+ReadLong                          0011B2
+ReadLongWord                      0011DC
+ReadShort                         0011CE
+ReadStr                           00121E
+ReadString                        001192
+ReadWord                          0011EA
+SCURSOR                           00000B
+SC_ECHO                           00000C
+SC_KPRESS                         000007
+SC_RCH                            000005
+SC_RINT                           000004
+SC_RST                            000002
+SC_WCH                            000006
+SC_WINT                           000003
+SC_WST                            000001
+SC_WSTCR                          000000
+SDISASM                           00003D
+SF_CLALL                          000032
+SF_CLEAR                          000039
+SF_CLOSE                          000038
+SF_CREAT                          000034
+SF_GETP                           000037
+SF_OPEN                           000033
+SF_READ                           000035
+SF_WRITE                          000036
+SLPT1                             00000A
+SMONITOR                          000009
+SP_ACT                            00002C
+SP_INI                            000028
+SP_RCH                            000029
+SP_STAT                           00002D
+SP_TIN                            00002B
+SP_WST                            00002A
+SREGDIS                           00003E
+SREGS                             00003C
+STIME                             000008
+WriteBool                         001166
+WriteByte                         001158
+WriteChar                         001104
+WriteInt                          001120
+WriteLn                           0010DA
+WriteLnString                     0010E4
+WriteLong                         001112
+WriteLongWord                     00113C
+WriteShort                        00112E
+WriteString                       0010F4
+WriteWord                         00114A
+
+
+
+Filename : PR8_E_S.OBJ
+
+Global Symbol Name             Global Value
+
+AUX                               FFFFFC
+COMPROBAR                         00133C
+COND_FOR1                         0012D0
+COND_FOR3                         001380
+ELSE                              0013F4
+ELSE_1                            00129C
+ESC_RES                           001360
+FIN_FOR1                          001328
+FIN_FOR2                          001338
+FIN_FOR3                          0013D8
+FIN_IF                            001424
+FIN_REPEAT_1                      0012B4
+FIN_REPEAT_2                      00135A
+FOR1                              0012CA
+FOR2                              001328
+FOR3                              00137E
+IF                                0013EE
+LEE_DAT                           00122E
+LONTIRA01                         000022
+LONTIRA02                         000003
+LONTIRA03                         000028
+LONTIRA04                         000002
+LONTIRA05                         000005
+LONTIRA06                         000010
+LONTIRA07                         000013
+LONTIRA08                         000018
+LONTIRA09                         000029
+MAX_LONGINT                       FFFFFF
+REPEAT_1                          00123A
+REPEAT_2                          00134A
+RETORNO                           00000A
+TAMANO                            000004
+THEN                              00140E
+TIRA01                            001426
+TIRA02                            001448
+TIRA03                            00144B
+TIRA04                            001473
+TIRA05                            001475
+TIRA06                            00147A
+TIRA07                            00148A
+TIRA08                            00149D
+TIRA09                            0014B5
+VECTOR                            000006
+
+
+******************************************************************************
+*                             L O A D      M A P                             *
+******************************************************************************
+*    Section Name              Starting Address    Ending Address    Size    *
+******************************************************************************
+* PR8.OBJ                                                                    *
+*    CODE                           001040             00108D       00004E   *
+* ORDENAR.OBJ                                                                *
+*    CODE                           00108E             0010D9       00004C   *
+* INOUT_V1.OBJ                                                               *
+*    CODE                           0010DA             00122D       000154   *
+* PR8_E_S.OBJ                                                                *
+*    CODE                           00122E             0014DD       0002B0   *
+******************************************************************************
+
+                  Linker Output Filename : PR8.REC
+                  Disk Listing  Filename : PR8.map
+                  Symbol Table  Filename : PR8.sym
+                                Format   : Microtek
+
+
+         Link Errors :  0             Output Format :  Motorola S28
+
+

@@ -1,0 +1,75 @@
+[project]
+name=prac0
+netlist=prac0
+contents=prac0
+date=01/08/03
+time=22:43:57
+version=3.1.4.05.97
+generics=MAX
+Type=XILINX8
+top_level=schematic
+library_net=ON
+sim_mode=FUNC
+synthesize_only=Off
+lib_order=1015 133 153
+[libraries]
+1015= 
+133=c:\xilinx\active\syslib\simprims
+153=c:\xilinx\active\syslib\xc4000e
+[xilinx]
+libraries=unified
+family=2
+xact8=On
+xfam=XC4000E
+[device]
+xilinx=4003EPC84-1
+part=4003EPC84-1
+[ext_sheets]
+prac0.ucf= 
+prac0.tve= 
+PRAC0.PDF= 
+[netlist]
+external=FALSE
+[Schematic]
+Table01=Project
+Table02=Sheet
+Table03=Date
+[sheets]
+prac01= 
+[Log]
+netlist.log=Simulator Netlist Log
+[sim_config]
+Lower Bound=2048
+Upper Bound=2048
+B0 Period=50
+Transport Delay=On
+Enable Global Netlist Analysis=On
+Forced State=Default
+Output Waveform=Overwrite
+Global Reset=On
+Keep Comments=Off
+Execute Preset=Off
+Models Stabilization=On
+Pulse Global Reset Net Enabled=On
+Pulse Global Reset Net=1000
+[timings]
+prac0=
+ 
+ 
+[APP_95]
+lid=0
+oid=0
+source=C:\DOCUME~1\ADMINI~1.ALM\MISDOC~1\URJC\ETC1\PRAC0\PRAC0\PRAC01.SCH
+[FILE7]
+scan_time=1046230883
+[OPEN32]
+nMaxFile=256
+lpstrFile=
+lpstrFilter=Edif 200 (*.ED*)|*.ED*|Susie Binary (*.ALB; *.ALR)|*.ALB; *.ALR|Xilinx (*.XN*; *.BAX)|*.XN*; *.BAX||
+lpstrInitialDir=C:\DOCUME~1\ADMINI~1.ALM\MISDOC~1\URJC\ETC1\PRAC0\PRAC0
+lpstrTitle=Load Netlist
+nFilterIndex=1
+Flags=528404
+cmdLine=-h 448 -hp 1260 -m PCM_OPEN_32_MESSAGE -f C:\XILINX\ACTIVE\PROJECTS\current.pdf
+[sc_desk]
+desk00=C:\DOCUME~1\ADMINI~1.ALM\MISDOC~1\URJC\ETC1\PRAC0\PRAC0\PRAC01.SCH, 22, 22, 822, 475, 1

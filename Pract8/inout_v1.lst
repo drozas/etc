@@ -1,0 +1,458 @@
+  Tue Sep  9 2003 08:36                                                                                                  Page    1
+
+
+
+
+
+
+
+               2500 A.D. 68000 Macro Assembler - Version 4.01e
+               -----------------------------------------------
+
+                       Input  Filename : INOUT_V1.ASM
+                       Output Filename : INOUT_V1.obj
+
+
+    1                                			SYMBOLS
+    2                                	
+    3                                	***************************************
+    4                                	* DEFINICIÓN DE SÍMBOLOS EXPORTADOS
+    5                                	***************************************
+    6                                			XDEF	WriteLn,WriteLnString
+    7                                			XDEF	WriteString,WriteChar
+    8                                			XDEF	WriteLong,WriteInt,WriteShort
+    9                                			XDEF	WriteLongWord,WriteWord,WriteByte
+   10                                			XDEF	WriteBool
+   11                                			XDEF	DefineEcho,KeyPressed
+   12                                			XDEF	ReadString,ReadChar
+   13                                			XDEF	ReadLong,ReadInt,ReadShort
+   14                                			XDEF	ReadLongWord,ReadWord,ReadByte
+   15                                			XDEF	ReadBool
+   16                                	
+   17                                	***************************************
+   18                                	* Servicios del simulador
+   19                                	***************************************
+   20            0000 0000           	SC_WSTCR	EQU	0	Escribir tira de caracteres con CR/LF
+   21            0000 0001           	SC_WST		EQU	1	Escribir tira de caracteres
+   22            0000 0002           	SC_RST		EQU	2	Leer tira de caracteres (máx: 80)
+   23            0000 0003           	SC_WINT		EQU	3	Escribir entero
+   24            0000 0004           	SC_RINT		EQU	4	Leer entero
+   25            0000 0005           	SC_RCH		EQU	5	Leer carácter
+   26            0000 0006           	SC_WCH		EQU	6	Escribir carácter
+   27            0000 0007           	SC_KPRESS	EQU	7	Ver si hay entradas pendientes por teclado
+   28            0000 0008           	STIME		EQU	8	Hora del sistema
+   29            0000 0009           	SMONITOR	EQU	9	Llamada al monitor
+   30            0000 000A           	SLPT1		EQU	10	Imprimir tira de caracteres por LPT1
+   31            0000 000B           	SCURSOR		EQU	11	Posicionar el cursor
+   32            0000 000C           	SC_ECHO		EQU	12	Eco en pantalla para lecturas desde teclado
+   33            0000 0028           	SP_INI		EQU	40	Iniciar puerto de comunicaciones COM
+   34            0000 0029           	SP_RCH		EQU	41	Leer un carácter del puerto
+   35            0000 002A           	SP_WST		EQU	42	Escribir una tira de caracteres
+   36            0000 002B           	SP_TIN		EQU	43	Test de entrada pendiente
+   37            0000 002C           	SP_ACT		EQU	44	Activar RTS/DTR
+   38            0000 002D           	SP_STAT		EQU	45	Chequeo del estado de las líneas del puerto
+   39            0000 0032           	SF_CLALL	EQU	50	Cerrar todos los ficheros abiertos
+   40            0000 0033           	SF_OPEN		EQU	51	Abrir un fichero existente
+   41            0000 0034           	SF_CREAT	EQU	52	Crear un fichero nuevo
+   42            0000 0035           	SF_READ		EQU	53	Leer una cadena de bytes de fichero
+   43            0000 0036           	SF_WRITE	EQU	54	Escribir una cadena de bytes en fichero
+   44            0000 0037           	SF_GETP		EQU	55	Obtener la posición actual del fichero
+   45            0000 0038           	SF_CLOSE	EQU	56	Cerrar un fichero
+   46            0000 0039           	SF_CLEAR	EQU	57	Borrar un fichero
+   47            0000 003C           	SREGS		EQU	60	Muestra el contenido de los registros
+  Tue Sep  9 2003 08:36                                                                                                  Page    2
+
+
+
+
+   48            0000 003D           	SDISASM		EQU	61	Desensambla una instrucción
+   49            0000 003E           	SREGDIS		EQU	62	Muestra los registros y desensambla una instrucción
+   50                                	
+   51                                	
+   52                                	**********************
+   53                                	*
+   54                                	* PROCEDIMIENTO PARA ESCRIBIR UN SALTO DE LÍNEA
+   55                                	*
+   56                                	**********************
+   57            0000 0000           	WriteLn		EQU	*
+   58                                	*		CLR.L	A1
+   59   000000   103C 0000           			MOVE.B	#SC_WSTCR,D0
+   60   000004   4241                			CLR.W	D1
+   61   000006   4E4F                			TRAP	#15
+   62   000008   4E75                			RTS
+   63                                	
+   64                                	**********************
+   65                                	*
+   66                                	* PROCEDIMIENTO PARA ESCRIBIR UNA TIRA DE CARACTERES Y UN SALTO DE LÍNEA
+   67                                	*
+   68                                	**********************
+   69                                	* Argumentos
+   70                                	*   1: dirección de comienzo de la tira de caracteres (4 octetos)
+   71                                	*   2: longitud de la tira de caracteres (2 octetos)
+   72                                	**********************
+   73            0000 000A           	WriteLnString	EQU	*
+   74   00000A   226F 0006           			MOVEA.L	6(SP),A1
+   75   00000E   103C 0000           			MOVE.B	#SC_WSTCR,D0
+   76   000012   322F 0004           			MOVE.W	4(SP),D1
+   77   000016   4E4F                			TRAP	#15
+   78   000018   4E75                			RTS
+   79                                	
+   80                                	**********************
+   81                                	*
+   82                                	* PROCEDIMIENTO PARA ESCRIBIR UNA TIRA DE CARACTERES
+   83                                	*
+   84                                	**********************
+   85                                	* Argumentos
+   86                                	*   1: dirección de comienzo de la tira de caracteres (4 octetos)
+   87                                	*   2: longitud de la tira de caracteres (2 octetos)
+   88                                	**********************
+   89            0000 001A           	WriteString	EQU	*
+   90   00001A   226F 0006           			MOVEA.L	6(SP),A1
+   91   00001E   103C 0001           			MOVE.B	#SC_WST,D0
+   92   000022   322F 0004           			MOVE.W	4(SP),D1
+   93   000026   4E4F                			TRAP	#15
+   94   000028   4E75                			RTS
+   95                                	
+   96                                	**********************
+   97                                	*
+   98                                	* PROCEDIMIENTO PARA ESCRIBIR UN CARÁCTER
+   99                                	*
+  100                                	**********************
+  101                                	* Argumentos
+  102                                	*   1: carácter que se pretende escribir (2 octetos, el primero vacío)
+  103                                	**********************
+  104            0000 002A           	WriteChar	EQU	*
+  Tue Sep  9 2003 08:36                                                                                                  Page    3
+
+
+
+
+  105   00002A   103C 0006           			MOVE.B	#SC_WCH,D0
+  106   00002E   4281                			CLR.L	D1
+  107   000030   122F 0005           			MOVE.B	5(SP),D1
+  108   000034   4E4F                			TRAP	#15
+  109   000036   4E75                			RTS
+  110                                	
+  111                                	**********************
+  112                                	*
+  113                                	* PROCEDIMIENTO PARA ESCRIBIR UN ENTERO DE 32 BITS
+  114                                	*
+  115                                	**********************
+  116                                	* Argumentos
+  117                                	*   1: entero que se pretende escribir (4 octetos)
+  118                                	**********************
+  119            0000 0038           	WriteLong	EQU	*
+  120   000038   103C 0003           			MOVE.B	#SC_WINT,D0
+  121   00003C   4281                			CLR.L	D1
+  122   00003E   222F 0004           			MOVE.L	4(SP),D1
+  123   000042   4E4F                			TRAP	#15
+  124   000044   4E75                			RTS
+  125                                	
+  126                                	**********************
+  127                                	*
+  128                                	* PROCEDIMIENTO PARA ESCRIBIR UN ENTERO DE 16 BITS
+  129                                	*
+  130                                	**********************
+  131                                	* Argumentos
+  132                                	*   1: entero que se pretende escribir (2 octetos)
+  133                                	**********************
+  134            0000 0046           	WriteInt	EQU	*
+  135   000046   103C 0003           			MOVE.B	#SC_WINT,D0
+  136   00004A   4281                			CLR.L	D1
+  137   00004C   322F 0004           			MOVE.W	4(SP),D1
+  138   000050   4E4F                			TRAP	#15
+  139   000052   4E75                			RTS
+  140                                	
+  141                                	**********************
+  142                                	*
+  143                                	* PROCEDIMIENTO PARA ESCRIBIR UN ENTERO DE 8 BITS
+  144                                	*
+  145                                	**********************
+  146                                	* Argumentos
+  147                                	*   1: entero que se pretende escribir (2 octetos, el primero vacío)
+  148                                	**********************
+  149            0000 0054           	WriteShort	EQU	*
+  150   000054   103C 0003           			MOVE.B	#SC_WINT,D0
+  151   000058   4281                			CLR.L	D1
+  152   00005A   122F 0005           			MOVE.B	5(SP),D1
+  153   00005E   4E4F                			TRAP	#15
+  154   000060   4E75                			RTS
+  155                                	
+  156                                	**********************
+  157                                	*
+  158                                	* PROCEDIMIENTO PARA ESCRIBIR UN ENTERO SIN SIGNO DE 32 BITS
+  159                                	*
+  160                                	**********************
+  161                                	* Argumentos
+  Tue Sep  9 2003 08:36                                                                                                  Page    4
+
+
+
+
+  162                                	*   1: entero que se pretende escribir (4 octetos)
+  163                                	**********************
+  164            0000 0062           	WriteLongWord	EQU	*
+  165   000062   103C 0003           			MOVE.B	#SC_WINT,D0
+  166   000066   4281                			CLR.L	D1
+  167   000068   222F 0004           			MOVE.L	4(SP),D1
+  168   00006C   4E4F                			TRAP	#15
+  169   00006E   4E75                			RTS
+  170                                	
+  171                                	**********************
+  172                                	*
+  173                                	* PROCEDIMIENTO PARA ESCRIBIR UN ENTERO SIN SIGNO DE 16 BITS
+  174                                	*
+  175                                	**********************
+  176                                	* Argumentos
+  177                                	*   1: entero que se pretende escribir (2 octetos)
+  178                                	**********************
+  179            0000 0070           	WriteWord	EQU	*
+  180   000070   103C 0003           			MOVE.B	#SC_WINT,D0
+  181   000074   4281                			CLR.L	D1
+  182   000076   322F 0004           			MOVE.W	4(SP),D1
+  183   00007A   4E4F                			TRAP	#15
+  184   00007C   4E75                			RTS
+  185                                	
+  186                                	**********************
+  187                                	*
+  188                                	* PROCEDIMIENTO PARA ESCRIBIR UN ENTERO SIN SIGNO DE 8 BITS
+  189                                	*
+  190                                	**********************
+  191                                	* Argumentos
+  192                                	*   1: entero que se pretende escribir (2 octetos, el primero vacío)
+  193                                	**********************
+  194            0000 007E           	WriteByte	EQU	*
+  195   00007E   103C 0003           			MOVE.B	#SC_WINT,D0
+  196   000082   4281                			CLR.L	D1
+  197   000084   122F 0005           			MOVE.B	5(SP),D1
+  198   000088   4E4F                			TRAP	#15
+  199   00008A   4E75                			RTS
+  200                                	
+  201                                	**********************
+  202                                	*
+  203                                	* PROCEDIMIENTO PARA ESCRIBIR UN BOOLEANO
+  204                                	*
+  205                                	**********************
+  206                                	* Argumentos
+  207                                	*   1: booleano que se pretende escribir (2 octetos, el primero vacío)
+  208                                	**********************
+  209            0000 008C           	WriteBool	EQU	*
+  210   00008C   103C 0003           			MOVE.B	#SC_WINT,D0
+  211   000090   4281                			CLR.L	D1
+  212   000092   4A2F 0005           			TST.B	5(SP)
+  213   000096   56C1                			SNE	D1
+  214   000098   0201 0001           			ANDI.B	#$01,D1
+  215   00009C   4E4F                			TRAP	#15
+  216   00009E   4E75                			RTS
+  217                                	
+  218                                	**********************
+  Tue Sep  9 2003 08:36                                                                                                  Page    5
+
+
+
+
+  219                                	*
+  220                                	* PROCEDIMIENTO PARA (DES)ACTIVAR ECO EN PANTALLA EN LECTURAS DESDE TECLADO
+  221                                	*
+  222                                	**********************
+  223                                	* Argumentos
+  224                                	*   1: activación del eco (0: no hay eco; <>0: sí hay eco) (2 octetos, el primero vacío)
+  225                                	**********************
+  226            0000 00A0           	DefineEcho	EQU	*
+  227   0000A0   103C 000C           			MOVE.B	#SC_ECHO,D0
+  228   0000A4   122F 0005           			MOVE.B	5(SP),D1
+  229   0000A8   4E4F                			TRAP	#15
+  230   0000AA   4E75                			RTS
+  231                                	
+  232                                	**********************
+  233                                	*
+  234                                	* FUNCIÓN PARA DETECTAR SI HAY ALGUNA ENTRADA PENDIENTE POR TECLADO
+  235                                	*
+  236                                	**********************
+  237                                	* No hay argumentos
+  238                                	* Valor de retorno (2 octetos, el primero vacío)
+  239                                	*   1 si hay entrada pendiente, 0 si no
+  240                                	**********************
+  241            0000 00AC           	KeyPressed	EQU	*
+  242   0000AC   103C 0007           			MOVE.B	#SC_KPRESS,D0
+  243   0000B0   4E4F                			TRAP	#15
+  244   0000B2   1F41 0005           			MOVE.B	D1,5(SP)
+  245   0000B6   4E75                			RTS
+  246                                	
+  247                                	**********************
+  248                                	*
+  249                                	* PROCEDIMIENTO PARA LEER UNA TIRA DE CARACTERES
+  250                                	*
+  251                                	**********************
+  252                                	* Argumentos
+  253                                	*   1: dirección de comienzo de la tira de caracteres
+  254                                	*   2: dirección donde almacenar la tira leída (4 octetos)
+  255                                	**********************
+  256            0000 00B8           	ReadString	EQU	*
+  257   0000B8   226F 0008           			MOVEA.L	8(SP),A1
+  258   0000BC   246F 0004           			MOVEA.L	4(SP),A2
+  259   0000C0   103C 0002           			MOVE.B	#SC_RST,D0
+  260   0000C4   4E4F                			TRAP	#15
+  261   0000C6   3481                			MOVE.W	D1,(A2)
+  262   0000C8   4E75                			RTS
+  263                                	
+  264                                	**********************
+  265                                	*
+  266                                	* PROCEDIMIENTO PARA LEER UN CARÁCTER
+  267                                	*
+  268                                	**********************
+  269                                	* Argumentos
+  270                                	*   1: dirección destino del carácter leído
+  271                                	**********************
+  272            0000 00CA           	ReadChar	EQU	*
+  273   0000CA   103C 0005           			MOVE.B	#SC_RCH,D0
+  274   0000CE   4E4F                			TRAP	#15
+  275   0000D0   226F 0004           			MOVEA.L	4(SP),A1
+  Tue Sep  9 2003 08:36                                                                                                  Page    6
+
+
+
+
+  276   0000D4   1281                			MOVE.B	D1,(A1)
+  277   0000D6   4E75                			RTS
+  278                                	
+  279                                	**********************
+  280                                	*
+  281                                	* PROCEDIMIENTO PARA LEER UN ENTERO DE 32 BITS
+  282                                	*
+  283                                	**********************
+  284                                	* Argumentos
+  285                                	*   1: dirección destino del entero leído
+  286                                	**********************
+  287            0000 00D8           	ReadLong	EQU	*
+  288   0000D8   103C 0004           			MOVE.B	#SC_RINT,D0
+  289   0000DC   4E4F                			TRAP	#15
+  290   0000DE   226F 0004           			MOVEA.L	4(SP),A1
+  291   0000E2   2281                			MOVE.L	D1,(A1)
+  292   0000E4   4E75                			RTS
+  293                                	
+  294                                	**********************
+  295                                	*
+  296                                	* PROCEDIMIENTO PARA LEER UN ENTERO DE 16 BITS
+  297                                	*
+  298                                	**********************
+  299                                	* Argumentos
+  300                                	*   1: dirección destino del entero leído
+  301                                	**********************
+  302            0000 00E6           	ReadInt		EQU	*
+  303   0000E6   103C 0004           			MOVE.B	#SC_RINT,D0
+  304   0000EA   4E4F                			TRAP	#15
+  305   0000EC   226F 0004           			MOVEA.L	4(SP),A1
+  306   0000F0   3281                			MOVE.W	D1,(A1)
+  307   0000F2   4E75                			RTS
+  308                                	
+  309                                	**********************
+  310                                	*
+  311                                	* PROCEDIMIENTO PARA LEER UN ENTERO DE 8 BITS
+  312                                	*
+  313                                	**********************
+  314                                	* Argumentos
+  315                                	*   1: dirección destino del entero leído
+  316                                	**********************
+  317            0000 00F4           	ReadShort	EQU	*
+  318   0000F4   103C 0004           			MOVE.B	#SC_RINT,D0
+  319   0000F8   4E4F                			TRAP	#15
+  320   0000FA   226F 0004           			MOVEA.L	4(SP),A1
+  321   0000FE   1281                			MOVE.B	D1,(A1)
+  322   000100   4E75                			RTS
+  323                                	
+  324                                	**********************
+  325                                	*
+  326                                	* PROCEDIMIENTO PARA LEER UN ENTERO SIN SIGNO DE 32 BITS
+  327                                	*
+  328                                	**********************
+  329                                	* Argumentos
+  330                                	*   1: dirección destino del entero leído
+  331                                	**********************
+  332            0000 0102           	ReadLongWord	EQU	*
+  Tue Sep  9 2003 08:36                                                                                                  Page    7
+
+
+
+
+  333   000102   103C 0004           			MOVE.B	#SC_RINT,D0
+  334   000106   4E4F                			TRAP	#15
+  335   000108   226F 0004           			MOVEA.L	4(SP),A1
+  336   00010C   2281                			MOVE.L	D1,(A1)
+  337   00010E   4E75                			RTS
+  338                                	
+  339                                	**********************
+  340                                	*
+  341                                	* PROCEDIMIENTO PARA LEER UN ENTERO SIN SIGNO DE 16 BITS
+  342                                	*
+  343                                	**********************
+  344                                	* Argumentos
+  345                                	*   1: dirección destino del entero leído
+  346                                	**********************
+  347            0000 0110           	ReadWord	EQU	*
+  348   000110   103C 0004           			MOVE.B	#SC_RINT,D0
+  349   000114   4E4F                			TRAP	#15
+  350   000116   226F 0004           			MOVEA.L	4(SP),A1
+  351   00011A   3281                			MOVE.W	D1,(A1)
+  352   00011C   4E75                			RTS
+  353                                	
+  354                                	**********************
+  355                                	*
+  356                                	* PROCEDIMIENTO PARA LEER UN ENTERO SIN SIGNO DE 8 BITS
+  357                                	*
+  358                                	**********************
+  359                                	* Argumentos
+  360                                	*   1: dirección destino del entero leído
+  361                                	**********************
+  362            0000 011E           	ReadByte	EQU	*
+  363   00011E   103C 0004           			MOVE.B	#SC_RINT,D0
+  364   000122   4E4F                			TRAP	#15
+  365   000124   226F 0004           			MOVEA.L	4(SP),A1
+  366   000128   1281                			MOVE.B	D1,(A1)
+  367   00012A   4E75                			RTS
+  368                                	
+  369                                	**********************
+  370                                	*
+  371                                	* PROCEDIMIENTO PARA LEER UN BOOLEANO
+  372                                	*
+  373                                	**********************
+  374                                	* Argumentos
+  375                                	*   1: dirección destino del booleano leído
+  376                                	**********************
+  377            0000 012C           	ReadBool	EQU	*
+  378   00012C   103C 0004           			MOVE.B	#SC_RINT,D0
+  379   000130   4E4F                			TRAP	#15
+  380   000132   226F 0004           			MOVEA.L	4(SP),A1
+  381   000136   4A01                			TST.B	D1
+  382   000138   56EF 0005           			SNE	5(SP)
+  383   00013C   022F 0001 0005      			ANDI.B	#$01,5(SP)
+  384   000142   4E75                			RTS
+  385                                	
+  386                                	**********************
+  387                                	*
+  388                                	* PROCEDIMIENTO PARA LEER UNA TIRA DE CARACTERES (AÑADE AL FINAL EL CARÁCTER NULO)
+  389                                	*
+  Tue Sep  9 2003 08:36                                                                                                  Page    8
+
+
+
+
+  390                                	**********************
+  391                                	* Argumentos
+  392                                	*   1: dirección de comienzo de la tira de caracteres
+  393                                	**********************
+  394            0000 0144           	ReadStr		EQU	*
+  395   000144   226F 0004           			MOVEA.L	4(SP),A1
+  396   000148   103C 0002           			MOVE.B	#SC_RST,D0
+  397   00014C   4E4F                			TRAP	#15
+  398   00014E   4231 1000           			CLR.B	(A1,D1.W)
+  399   000152   4E75                			RTS
+  400                                	
+  401   000154                       			END
+
+
+
+           Lines Assembled :  401             Assembly Errors :  0
+
+
+

@@ -1,0 +1,180 @@
+  Thu Sep 11 2003 00:14                                                                                                  Page    1
+
+
+
+
+
+
+
+               2500 A.D. 68000 Macro Assembler - Version 4.01e
+               -----------------------------------------------
+
+                       Input  Filename : PR9_E_S.ASM
+                       Output Filename : PR9_E_S.obj
+
+
+    1                                			SYMBOLS
+    2                                	
+    3                                	***************************************
+    4                                	* DEFINICIÓN DE SÍMBOLOS EXPORTADOS
+    5                                	***************************************
+    6                                			XDEF	LEE_DAT,ESC_RES
+    7                                	
+    8                                	***************************************
+    9                                	* DEFINICIÓN DE SÍMBOLOS IMPORTADOS
+   10                                	***************************************
+   11                                			XREF	WriteRealHex,ReadRealHex,WriteString,WriteLn
+   12                                	
+   13                                	***************************************
+   14                                	* SUBRUTINA DE LECTURA DE DATOS POR TECLADO
+   15                                	***************************************
+   16            0000 0000           	LEE_DAT		EQU	*
+   17            0000 000C           	SUMANDO1	SET	12
+   18            0000 0008           	SUMANDO2	SET	8
+   19   000000   4E56 0000           			LINK	A6,#0
+   20                                	* Introducir el primer sumando
+   21   000004   4879 0000 0130      			PEA	TIRA01
+   22   00000A   3F3C 0030           			MOVE.W	#LONTIRA01,-(SP)
+   23   00000E   2F2E 000C           			MOVE.L	SUMANDO1(A6),-(SP)
+   24   000012   4EB9 0000 003C      			JSR	LEE_754
+   25   000018   DFFC 0000 000A      			ADDA.L	#10,SP
+   26                                	* Introducir el segundo sumando
+   27   00001E   4879 0000 0160      			PEA	TIRA02
+   28   000024   3F3C 0031           			MOVE.W	#LONTIRA02,-(SP)
+   29   000028   2F2E 0008           			MOVE.L	SUMANDO2(A6),-(SP)
+   30   00002C   4EB9 0000 003C      			JSR	LEE_754
+   31   000032   DFFC 0000 000A      			ADDA.L	#10,SP
+   32   000038   4E5E                			UNLK	A6
+   33   00003A   4E75                			RTS
+   34                                	
+   35                                	***************************************
+   36                                	* Leer un dato en IEEE 754 y asegurarse de que es correcto
+   37                                	* (un NaN o infinito son correctos)
+   38                                	***************************************
+   39            0000 003C           	LEE_754		EQU	*
+   40            0000 000E           	TIRA		SET	14
+   41            0000 000C           	LONTIRA		SET	12
+   42            0000 0008           	NUMERO		SET	8
+   43            FFFF FFFF           	OK		SET	-1
+   44   00003C   4E56 FFFE           			LINK	A6,#-2
+   45   000040   2F0D                			MOVE.L	A5,-(SP)
+   46                                	* Introducir el primer sumando
+   47   000042   2A6E 0008           			MOVEA.L	NUMERO(A6),A5
+  Thu Sep 11 2003 00:14                                                                                                  Page    2
+
+
+
+
+   48            0000 0046           	REPEAT		EQU	*
+   49   000046   2F2E 000E           			MOVE.L	TIRA(A6),-(SP)
+   50   00004A   3F2E 000C           			MOVE.W	LONTIRA(A6),-(SP)
+   51   00004E   4EB9 0000 0000      			JSR	WriteString
+   52   000054   DFFC 0000 0006      			ADDA.L	#6,SP
+   53   00005A   2F0D                			MOVE.L	A5,-(SP)
+   54   00005C   486E FFFF           			PEA	OK(A6)
+   55   000060   4EB9 0000 0000      			JSR	ReadRealHex
+   56   000066   DFFC 0000 0008      			ADDA.L	#8,SP
+   57   00006C   4A2E FFFF           			TST.B	OK(A6)
+   58   000070   6600 0020           			BNE	FIN_REPEAT
+   59   000074   4879 0000 0118      			PEA	TIRA00
+   60   00007A   3F3C 0018           			MOVE.W	#LONTIRA00,-(SP)
+   61   00007E   4EB9 0000 0000      			JSR	WriteString
+   62   000084   DFFC 0000 0006      			ADDA.L	#6,SP
+   63   00008A   4EB9 0000 0000      			JSR	WriteLn
+   64   000090   60B4                			BRA	REPEAT
+   65            0000 0092           	FIN_REPEAT	EQU	*
+   66   000092   2A5F                			MOVE.L	(SP)+,A5
+   67   000094   4E5E                			UNLK	A6
+   68   000096   4E75                			RTS
+   69                                	
+   70                                	***************************************
+   71                                	* SUBRUTINA DE ESCRITURA DE DATOS POR PANTALLA
+   72                                	***************************************
+   73            0000 0098           	ESC_RES		EQU	*
+   74            0000 0010           	SUMANDO1	SET	16
+   75            0000 000C           	SUMANDO2	SET	12
+   76            0000 0008           	RESULTADO	SET	8
+   77   000098   4E56 0000           			LINK	A6,#0
+   78                                	* Escribir resultado obtenido
+   79                                	* Escribir literal inicial
+   80   00009C   4879 0000 0191      			PEA	TIRA03
+   81   0000A2   3F3C 000B           			MOVE.W	#LONTIRA03,-(SP)
+   82   0000A6   4EB9 0000 0000      			JSR	WriteString
+   83   0000AC   DFFC 0000 0006      			ADDA.L	#6,SP
+   84                                	* Escribir primer sumando
+   85   0000B2   2F2E 0010           			MOVE.L	SUMANDO1(A6),-(SP)
+   86   0000B6   4EB9 0000 0000      			JSR	WriteRealHex
+   87   0000BC   DFFC 0000 0004      			ADDA.L	#4,SP
+   88                                	* Escribir ' + '
+   89   0000C2   4879 0000 019C      			PEA	TIRA04
+   90   0000C8   3F3C 0003           			MOVE.W	#LONTIRA04,-(SP)
+   91   0000CC   4EB9 0000 0000      			JSR	WriteString
+   92   0000D2   DFFC 0000 0006      			ADDA.L	#6,SP
+   93                                	* Escribir segundo sumando
+   94   0000D8   2F2E 000C           			MOVE.L	SUMANDO2(A6),-(SP)
+   95   0000DC   4EB9 0000 0000      			JSR	WriteRealHex
+   96   0000E2   DFFC 0000 0004      			ADDA.L	#4,SP
+   97                                	* Escribir ' = '
+   98   0000E8   4879 0000 019F      			PEA	TIRA05
+   99   0000EE   3F3C 0003           			MOVE.W	#LONTIRA05,-(SP)
+  100   0000F2   4EB9 0000 0000      			JSR	WriteString
+  101   0000F8   DFFC 0000 0006      			ADDA.L	#6,SP
+  102                                	* Escribir resultado
+  103   0000FE   2F2E 0008           			MOVE.L	RESULTADO(A6),-(SP)
+  104   000102   4EB9 0000 0000      			JSR	WriteRealHex
+  Thu Sep 11 2003 00:14                                                                                                  Page    3
+
+
+
+
+  105   000108   DFFC 0000 0004      			ADDA.L	#4,SP
+  106                                	* Escribir salto de linea
+  107   00010E   4EB9 0000 0000      			JSR	WriteLn
+  108   000114   4E5E                			UNLK	A6
+  109   000116   4E75                			RTS
+  110                                	
+  111                                	***************************************
+  112                                	* ZONA DE ALMACENAMIENTO DE CONSTANTES EN TIEMPO DE EJECUCIÓN
+  113                                	***************************************
+  114                                	* Aquí definimos las variables con valor inicial, que suelen consistir
+  115                                	* en tiras de caracteres constantes utilizadas a lo largo del programa
+  116   000118   45 72 72 6F 72 3A   	TIRA00		DC.B	"Error: numero incorrecto"
+                 20 6E 75 6D 65 72 
+                 6F 20 69 6E 63 6F 
+                 72 72 65 63 74 6F 
+  117            0000 0018           	LONTIRA00	EQU	*-TIRA00
+  118   000130   50 72 69 6D 65 72   	TIRA01		DC.B	"Primer sumando (formato compacto hexadecimal) = "
+                 20 73 75 6D 61 6E 
+                 64 6F 20 28 66 6F 
+                 72 6D 61 74 6F 20 
+                 63 6F 6D 70 61 63 
+                 74 6F 20 68 65 78 
+                 61 64 65 63 69 6D 
+                 61 6C 29 20 3D 20 
+  119            0000 0030           	LONTIRA01	EQU	*-TIRA01
+  120   000160   53 65 67 75 6E 64   	TIRA02		DC.B	"Segundo sumando (formato compacto hexadecimal) = "
+                 6F 20 73 75 6D 61 
+                 6E 64 6F 20 28 66 
+                 6F 72 6D 61 74 6F 
+                 20 63 6F 6D 70 61 
+                 63 74 6F 20 68 65 
+                 78 61 64 65 63 69 
+                 6D 61 6C 29 20 3D 
+                 20 
+  121            0000 0031           	LONTIRA02	EQU	*-TIRA02
+  122   000191   52 65 73 75 6C 74   	TIRA03		DC.B	"Resultado: "
+                 61 64 6F 3A 20 
+  123            0000 000B           	LONTIRA03	EQU	*-TIRA03
+  124   00019C   20 2B 20            	TIRA04		DC.B	" + "
+  125            0000 0003           	LONTIRA04	EQU	*-TIRA04
+  126   00019F   20 3D 20            	TIRA05		DC.B	" = "
+  127            0000 0003           	LONTIRA05	EQU	*-TIRA05
+  128                                	
+  129   0001A2                       			END
+
+
+
+           Lines Assembled :  129             Assembly Errors :  0
+
+
+

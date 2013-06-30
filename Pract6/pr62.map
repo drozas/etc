@@ -1,0 +1,37 @@
+
+
+
+Filename : PR62.OBJ
+
+Global Symbol Name             Global Value
+
+A                                 001000
+B                                 001002
+C                                 001004
+D                                 001006
+E                                 001008
+ESNEG                             000452
+INICIO                            000400
+SIGNO                             00100C
+
+
+******************************************************************************
+*                             L O A D      M A P                             *
+******************************************************************************
+*    Section Name              Starting Address    Ending Address    Size    *
+******************************************************************************
+* PR62.OBJ                                                                   *
+*    CODE                           000400             000451       000052   *
+*                                   001000             001007       000008   *
+*                                   00100D             00100D       000001   *
+******************************************************************************
+
+                  Linker Output Filename : PR62.REC
+                  Disk Listing  Filename : PR62.map
+                  Symbol Table  Filename : PR62.sym
+                                Format   : Microtek
+
+
+         Link Errors :  0             Output Format :  Motorola S28
+
+

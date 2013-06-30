@@ -1,0 +1,263 @@
+  Tue Sep  9 2003 08:36                                                                                                  Page    1
+
+
+
+
+
+
+
+               2500 A.D. 68000 Macro Assembler - Version 4.01e
+               -----------------------------------------------
+
+                       Input  Filename : PR8_E_S.ASM
+                       Output Filename : PR8_E_S.obj
+
+
+    1                                			SYMBOLS
+    2                                	
+    3                                	***************************************
+    4                                	* DEFINICIÓN DE SÍMBOLOS IMPORTADOS
+    5                                	***************************************
+    6                                			XREF	WriteLn,WriteLnString,WriteString
+    7                                			XREF	ReadLong,WriteLong,WriteInt
+    8                                	
+    9                                	***************************************
+   10                                	* DEFINICIÓN DE SÍMBOLOS EXPORTADOS
+   11                                	***************************************
+   12                                			XDEF	LEE_DAT,ESC_RES
+   13                                	
+   14                                	***************************************
+   15                                	* SUBRUTINA DE LECTURA DE DATOS POR TECLADO
+   16                                	***************************************
+   17            0000 0000           	LEE_DAT		EQU	*
+   18            7FFF FFFF           	MAX_LONGINT	EQU	$7FFFFFFF
+   19            FFFF FFFC           	AUX		SET	-4
+   20            0000 0008           	TAMANO		SET	8
+   21            0000 000A           	VECTOR		SET	10
+   22   000000   4E56 FFFC           			LINK	A6,#-4
+   23   000004   3E2E 0008           			MOVE.W	TAMANO(A6),D7
+   24   000008   2A6E 000A           			MOVEA.L	VECTOR(A6),A5
+   25                                	* Introducir el número de elementos del vector
+   26            0000 000C           	REPEAT_1	EQU	*
+   27   00000C   4879 0000 01F8      			PEA	TIRA01
+   28   000012   3F3C 0022           			MOVE.W	#LONTIRA01,-(SP)
+   29   000016   4EB9 0000 0000      			JSR	WriteString
+   30   00001C   DFFC 0000 0006      			ADDA.L	#6,SP
+   31   000022   3F07                			MOVE.W	D7,-(SP)
+   32   000024   4EB9 0000 0000      			JSR	WriteInt
+   33   00002A   DFFC 0000 0002      			ADDA.L	#2,SP
+   34   000030   4879 0000 021A      			PEA	TIRA02
+   35   000036   3F3C 0003           			MOVE.W	#LONTIRA02,-(SP)
+   36   00003A   4EB9 0000 0000      			JSR	WriteString
+   37   000040   DFFC 0000 0006      			ADDA.L	#6,SP
+   38   000046   486E FFFC           			PEA	AUX(A6)
+   39   00004A   4EB9 0000 0000      			JSR	ReadLong		
+   40   000050   DFFC 0000 0004      			ADDA.L	#4,SP
+   41   000056   0CAE 0000 0001 FFFC 			CMPI.L	#1,AUX(A6)
+   42   00005E   6F00 000E           			BLE	ELSE_1
+   43   000062   BEAE FFFC           			CMP.L	AUX(A6),D7
+   44   000066   6D00 0006           			BLT	ELSE_1
+   45   00006A   6000 001A           			BRA	FIN_REPEAT_1
+   46   00006E   4879 0000 0287      	ELSE_1		PEA	TIRA09
+   47   000074   3F3C 0029           			MOVE.W	#LONTIRA09,-(SP)
+  Tue Sep  9 2003 08:36                                                                                                  Page    2
+
+
+
+
+   48   000078   4EB9 0000 0000      			JSR	WriteLnString
+   49   00007E   DFFC 0000 0006      			ADDA.L	#6,SP
+   50   000084   6086                			BRA	REPEAT_1
+   51            0000 0086           	FIN_REPEAT_1	EQU	*
+   52   000086   4879 0000 021D      			PEA	TIRA03
+   53   00008C   3F3C 0028           			MOVE.W	#LONTIRA03,-(SP)
+   54   000090   4EB9 0000 0000      			JSR	WriteLnString
+   55   000096   DFFC 0000 0006      			ADDA.L	#6,SP
+   56            0000 009C           	FOR1		EQU	*
+   57   00009C   2C2E FFFC           			MOVE.L	AUX(A6),D6
+   58   0000A0   4285                			CLR.L	D5
+   59            0000 00A2           	COND_FOR1	EQU	*
+   60   0000A2   BA86                			CMP.L	D6,D5
+   61   0000A4   6C00 0054           			BGE	FIN_FOR1
+   62   0000A8   4879 0000 0245      			PEA	TIRA04
+   63   0000AE   3F3C 0002           			MOVE.W	#LONTIRA04,-(SP)
+   64   0000B2   4EB9 0000 0000      			JSR	WriteString
+   65   0000B8   DFFC 0000 0006      			ADDA.L	#6,SP
+   66   0000BE   3F05                			MOVE.W	D5,-(SP)
+   67   0000C0   4EB9 0000 0000      			JSR	WriteInt
+   68   0000C6   DFFC 0000 0002      			ADDA.L	#2,SP
+   69   0000CC   4879 0000 0247      			PEA	TIRA05
+   70   0000D2   3F3C 0005           			MOVE.W	#LONTIRA05,-(SP)
+   71   0000D6   4EB9 0000 0000      			JSR	WriteString
+   72   0000DC   DFFC 0000 0006      			ADDA.L	#6,SP
+   73   0000E2   2F0D                			MOVE.L	A5,-(SP)
+   74   0000E4   4EB9 0000 0000      			JSR	ReadLong		
+   75   0000EA   DFFC 0000 0004      			ADDA.L	#4,SP
+   76                                	*		JSR	WriteLn
+   77   0000F0   5285                			ADDQ.L	#1,D5
+   78   0000F2   DBFC 0000 0004      			ADDA.L	#4,A5
+   79   0000F8   60A8                			BRA	COND_FOR1
+   80            0000 00FA           	FIN_FOR1	EQU	*
+   81            0000 00FA           	FOR2		EQU	*
+   82   0000FA   BC87                			CMP.L	D7,D6
+   83   0000FC   6C00 000C           			BGE	FIN_FOR2
+   84   000100   2AFC 7FFF FFFF      			MOVE.L	#MAX_LONGINT,(A5)+
+   85   000106   5286                			ADDQ.L	#1,D6
+   86   000108   60F0                			BRA	FOR2
+   87            0000 010A           	FIN_FOR2	EQU	*
+   88   00010A   4E5E                			UNLK	A6
+   89   00010C   4E75                			RTS
+   90                                	
+   91                                	***************************************
+   92                                	* COMPROBAR
+   93                                	***************************************
+   94            0000 010E           	COMPROBAR	EQU	*
+   95            0000 0004           	TAMANO		SET	4
+   96            0000 0006           	VECTOR		SET	6
+   97            0000 000A           	RETORNO		SET	10
+   98   00010E   2A6F 0006           			MOVEA.L	VECTOR(SP),A5
+   99   000112   382F 0004           			MOVE.W	TAMANO(SP),D4
+  100   000116   5344                			SUBQ.W	#1,D4
+  101   000118   4247                			CLR.W	D7
+  102   00011A   4246                			CLR.W	D6
+  103            0000 011C           	REPEAT_2	EQU	*
+  104   00011C   2A1D                			MOVE.L	(A5)+,D5
+  Tue Sep  9 2003 08:36                                                                                                  Page    3
+
+
+
+
+  105   00011E   BA95                			CMP.L	(A5),D5
+  106   000120   5FC7                			SLE	D7
+  107   000122   6E00 0008           			BGT	FIN_REPEAT_2
+  108   000126   5246                			ADDQ.W	#1,D6
+  109   000128   BC44                			CMP.W	D4,D6
+  110   00012A   6DF0                			BLT	REPEAT_2
+  111            0000 012C           	FIN_REPEAT_2	EQU	*
+  112   00012C   3F47 000A           			MOVE.W	D7,RETORNO(SP)
+  113   000130   4E75                			RTS
+  114                                	
+  115                                	***************************************
+  116                                	* SUBRUTINA DE ESCRITURA DE DATOS POR PANTALLA
+  117                                	***************************************
+  118            0000 0132           	ESC_RES		EQU	*
+  119            0000 0004           	TAMANO		SET	4
+  120            0000 0006           	VECTOR		SET	6
+  121                                	* Escribir resultado obtenido
+  122   000132   3C2F 0004           			MOVE.W	TAMANO(SP),D6
+  123   000136   2A6F 0006           			MOVEA.L	VECTOR(SP),A5
+  124   00013A   4879 0000 024C      			PEA	TIRA06
+  125   000140   3F3C 0010           			MOVE.W	#LONTIRA06,-(SP)
+  126   000144   4EB9 0000 0000      			JSR	WriteLnString
+  127   00014A   DFFC 0000 0006      			ADDA.L	#6,SP
+  128            0000 0150           	FOR3		EQU	*
+  129   000150   4247                			CLR.W	D7
+  130   000152   BE46                	COND_FOR3	CMP.W	D6,D7
+  131   000154   6C00 0054           			BGE	FIN_FOR3
+  132   000158   4879 0000 0245      			PEA	TIRA04
+  133   00015E   3F3C 0002           			MOVE.W	#LONTIRA04,-(SP)
+  134   000162   4EB9 0000 0000      			JSR	WriteString
+  135   000168   DFFC 0000 0006      			ADDA.L	#6,SP
+  136   00016E   3F07                			MOVE.W	D7,-(SP)
+  137   000170   4EB9 0000 0000      			JSR	WriteInt
+  138   000176   DFFC 0000 0002      			ADDA.L	#2,SP
+  139   00017C   4879 0000 0247      			PEA	TIRA05
+  140   000182   3F3C 0005           			MOVE.W	#LONTIRA05,-(SP)
+  141   000186   4EB9 0000 0000      			JSR	WriteString
+  142   00018C   DFFC 0000 0006      			ADDA.L	#6,SP
+  143   000192   2F1D                			MOVE.L	(A5)+,-(SP)
+  144   000194   4EB9 0000 0000      			JSR	WriteLong
+  145   00019A   DFFC 0000 0004      			ADDA.L	#4,SP
+  146   0001A0   4EB9 0000 0000      			JSR	WriteLn
+  147   0001A6   5247                			ADDQ.W	#1,D7
+  148   0001A8   60A8                			BRA	COND_FOR3
+  149            0000 01AA           	FIN_FOR3	EQU	*
+  150   0001AA   2A6F 0006           			MOVEA.L	VECTOR(SP),A5
+  151   0001AE   4267                			CLR.W	-(SP)
+  152   0001B0   2F0D                			MOVE.L	A5,-(SP)
+  153   0001B2   3F07                			MOVE.W	D7,-(SP)
+  154   0001B4   4EB9 0000 010E      			JSR	COMPROBAR
+  155   0001BA   DFFC 0000 0006      			ADDA.L	#6,SP
+  156            0000 01C0           	IF		EQU	*
+  157   0001C0   4A5F                			TST.W	(SP)+
+  158   0001C2   6600 001C           			BNE	THEN
+  159   0001C6   4879 0000 026F      	ELSE		PEA	TIRA08
+  160   0001CC   3F3C 0018           			MOVE.W	#LONTIRA08,-(SP)
+  161   0001D0   4EB9 0000 0000      			JSR	WriteLnString
+  Tue Sep  9 2003 08:36                                                                                                  Page    4
+
+
+
+
+  162   0001D6   DFFC 0000 0006      			ADDA.L	#6,SP
+  163   0001DC   6000 0018           			BRA	FIN_IF
+  164   0001E0   4879 0000 025C      	THEN		PEA	TIRA07
+  165   0001E6   3F3C 0013           			MOVE.W	#LONTIRA07,-(SP)
+  166   0001EA   4EB9 0000 0000      			JSR	WriteLnString
+  167   0001F0   DFFC 0000 0006      			ADDA.L	#6,SP
+  168            0000 01F6           	FIN_IF		EQU	*
+  169   0001F6   4E75                			RTS
+  170                                	
+  171                                	
+  172                                	***************************************
+  173                                	* ZONA DE ALMACENAMIENTO DE CONSTANTES EN TIEMPO DE EJECUCIÓN
+  174                                	***************************************
+  175                                	* Aquí definimos las variables con valor inicial, que suelen consistir
+  176                                	* en tiras de caracteres constantes utilizadas a lo largo del programa
+  177   0001F8   4E 75 6D 65 72 6F   	TIRA01		DC.B	"Numero de elementos del vector [1,"
+                 20 64 65 20 65 6C 
+                 65 6D 65 6E 74 6F 
+                 73 20 64 65 6C 20 
+                 76 65 63 74 6F 72 
+                 20 5B 31 2C 
+  178            0000 0022           	LONTIRA01	EQU	*-TIRA01
+  179   00021A   5D 3A 20            	TIRA02		DC.B	"]: "
+  180            0000 0003           	LONTIRA02	EQU	*-TIRA02
+  181   00021D   49 6E 74 72 6F 64   	TIRA03		DC.B	"Introduccion de los elementos del vector"
+                 75 63 63 69 6F 6E 
+                 20 64 65 20 6C 6F 
+                 73 20 65 6C 65 6D 
+                 65 6E 74 6F 73 20 
+                 64 65 6C 20 76 65 
+                 63 74 6F 72 
+  182            0000 0028           	LONTIRA03	EQU	*-TIRA03
+  183   000245   76 5B               	TIRA04		DC.B	"v["
+  184            0000 0002           	LONTIRA04	EQU	*-TIRA04
+  185   000247   5D 20 3A 3D 20      	TIRA05		DC.B	"] := "
+  186            0000 0005           	LONTIRA05	EQU	*-TIRA05
+  187   00024C   56 65 63 74 6F 72   	TIRA06		DC.B	"Vector ordenado:"
+                 20 6F 72 64 65 6E 
+                 61 64 6F 3A 
+  188            0000 0010           	LONTIRA06	EQU	*-TIRA06
+  189   00025C   4F 52 44 45 4E 41   	TIRA07		DC.B	"ORDENACION CORRECTA"
+                 43 49 4F 4E 20 43 
+                 4F 52 52 45 43 54 
+                 41 
+  190            0000 0013           	LONTIRA07	EQU	*-TIRA07
+  191   00026F   4F 52 44 45 4E 41   	TIRA08		DC.B	"ORDENACION MAL REALIZADA"
+                 43 49 4F 4E 20 4D 
+                 41 4C 20 52 45 41 
+                 4C 49 5A 41 44 41 
+  192            0000 0018           	LONTIRA08	EQU	*-TIRA08
+  193   000287   45 72 72 6F 72 3A   	TIRA09		DC.B	"Error: numero incorrecto o fuera de rango"
+                 20 6E 75 6D 65 72 
+                 6F 20 69 6E 63 6F 
+                 72 72 65 63 74 6F 
+                 20 6F 20 66 75 65 
+                 72 61 20 64 65 20 
+                 72 61 6E 67 6F 
+  Tue Sep  9 2003 08:36                                                                                                  Page    5
+
+
+
+
+  194            0000 0029           	LONTIRA09	EQU	*-TIRA09
+  195                                	
+  196   0002B0                       			END
+
+
+
+           Lines Assembled :  196             Assembly Errors :  0
+
+
+

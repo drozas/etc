@@ -1,0 +1,39 @@
+
+
+
+Filename : pr61.obj
+
+Global Symbol Name             Global Value
+
+A                                 001000
+B                                 001002
+C                                 001004
+D                                 001006
+E                                 001008
+FIN_SI                            000448
+INICIO                            000400
+NEGATIVO                          000434
+POSITIVO                          000440
+SIGNO                             00100C
+
+
+******************************************************************************
+*                             L O A D      M A P                             *
+******************************************************************************
+*    Section Name              Starting Address    Ending Address    Size    *
+******************************************************************************
+* pr61.obj                                                                   *
+*    CODE                           000400             00044B       00004C   *
+*                                   001000             001007       000008   *
+*                                   00100D             00100D       000001   *
+******************************************************************************
+
+                  Linker Output Filename : pr61.rec
+                  Disk Listing  Filename : pr61.map
+                  Symbol Table  Filename : pr61.sym
+                                Format   : Microtek
+
+
+         Link Errors :  0             Output Format :  Motorola S28
+
+

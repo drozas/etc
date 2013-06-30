@@ -1,0 +1,157 @@
+  Tue Sep  9 2003 03:34                                                                                                  Page    1
+
+
+
+
+
+
+
+               2500 A.D. 68000 Macro Assembler - Version 4.01e
+               -----------------------------------------------
+
+                       Input  Filename : PR7.ASM
+                       Output Filename : PR7.obj
+
+
+    1                                			SYMBOLS
+    2                                	
+    3                                	***************************************
+    4                                	* DEFINICIÓN DE SÍMBOLOS IMPORTADOS
+    5                                	***************************************
+    6                                	
+    7                                			XREF	LEE_ENT,ESC_RES
+    8                                	
+    9                                	***************************************
+   10                                	* DEFINICIÓN DE SÍMBOLOS EXPORTADOS
+   11                                	***************************************
+   12                                			XDEF	DIVIDENDO,DIVISOR,COCIENTE,RESTO
+   13                                	
+   14                                	***************************************
+   15                                	* ZONA DE DATOS GLOBALES DEL PROGRAMA
+   16                                	***************************************
+   17   001000                       			ORG	$1000
+   18            0000 1000           	VAR		EQU	*
+   19   001000                       	DIVIDENDO	DS	2
+   20   001002                       	DIVISOR		DS	2
+   21   001004                       	COCIENTE	DS	2
+   22   001006                       	RESTO		DS	2
+   23   001008                       	I		DS	2
+   24                                	* Registros:
+   25                                	* - D0 se utiliza como variable temporal (TMP del pseudocódigo en Pascal)
+   26                                	* - D1 contiene el valor absoluto del divisor (DVSR_ABS del pseudocódigo en Pascal)
+   27                                	* - D2 contiene el valor absoluto del dividendo 
+   28                                	***************************************
+   29                                	* PROGRAMA PRINCIPAL
+   30                                	***************************************
+   31                                	
+   32                                	* Código de inicio del programa
+   33                                	*    1. Asignar etiqueta
+   34   001000                       			ORG	$1000
+   35            0000 1000           	BEGIN		EQU	*
+   36                                	*    2. Iniciar puntero de pila
+   37   001000   4FF9 0000 A000      			LEA	$0000A000,SP
+   38                                	
+   39                                	* Pedir el dividendo y el divisor por teclado
+   40   001006   4EB9 0000 0000      			JSR	LEE_ENT
+   41                                	* Obtención del valor absoluto de divisor
+   42   00100C   4280                			CLR.L	D0
+   43   00100E   4281                			CLR.L	D1
+   44   001010   4282                			CLR.L	D2
+   45   001012   3239 0000 1002      			MOVE.W	DIVISOR,D1
+   46   001018   4A41                			TST.W 	D1
+   47   00101A   6A00 0004           			BPL	ESPOS
+  Tue Sep  9 2003 03:34                                                                                                  Page    2
+
+
+
+
+   48   00101E   4441                			NEG.w	D1
+   49            0000 1020           	ESPOS		EQU	*
+   50                                	* Obtención del valor absoluto del dividendo
+   51   001020   3439 0000 1000      			MOVE.W	DIVIDENDO,D2
+   52   001026   4A42                			TST.W	D2
+   53   001028   6A00 0004           			BPL	ESPOS2
+   54   00102C   4442                			NEG.w	D2
+   55            0000 102E           	ESPOS2		EQU	*
+   56                                	*Paso de valores al registro temporal: pasamos el dividendo absoluto a la parte 0..15; y la 
+                                                parte 16..31 ya esta a 0
+   57   00102E   3002                			MOVE.W	D2,D0
+   58                                	*Inicializacion de i, y comienzo del bucle
+   59   001030   4279 0000 1008      			CLR.W	I
+   60            0000 1036           	FOR		EQU	*
+   61   001036   0C79 000F 0000 1008 			CMP.W	#15,I
+   62   00103E   6200 002C           			BHI	FINFOR
+   63   001042   E380                			ASL.L	#1,D0
+   64   001044   4840                			SWAP	D0
+   65   001046   9041                			SUB.W	D1,D0
+   66            0000 1048           	IF		EQU	*
+   67   001048   4A40                			TST.W	D0
+   68   00104A   6A00 0012           			BPL	ELSE
+   69                                	
+   70   00104E   4840                			SWAP	D0
+   71   001050   0880 0000           			BCLR	#0,D0
+   72   001054   4840                			SWAP	D0
+   73   001056   D041                			ADD.W	D1,D0
+   74   001058   4840                			SWAP	D0
+   75   00105A   6000 0008           			BRA	ENDIF
+   76            0000 105E           	ELSE		EQU	*
+   77   00105E   4840                			SWAP	D0
+   78   001060   08C0 0000           			BSET	#0,D0
+   79            0000 1064           	ENDIF		EQU	*
+   80   001064   5279 0000 1008      			ADD.W	#1,I
+   81   00106A   60CA                			BRA	FOR
+   82            0000 106C           	FINFOR		EQU	*
+   83                                	
+   84                                	* Paso de los valores de la variable temporal, a las variables cociente y resto
+   85   00106C   33C0 0000 1004      			MOVE.W	D0,COCIENTE
+   86   001072   4840                			SWAP	D0
+   87   001074   33C0 0000 1006      			MOVE.W	D0,RESTO
+   88                                	
+   89                                	* Y ahora falta hacer las comprobaciones de los signos
+   90                                	* El signo del resto es igual que el del dividendo, luego...
+   91   00107A   4A79 0000 1000      			TST.W	DIVIDENDO
+   92   001080   6A00 0008           			BPL	NOCAMRESTO	si es positivo, saltamos para dejarlo igual
+   93   001084   4479 0000 1006      			NEG.W	RESTO		Y si no, lo cambiamos
+   94            0000 108A           	NOCAMRESTO	EQU	*
+   95                                	* Respecto al signo del cociente, si son iguales permanece igual, y si no hay que invertirlo
+                                                ...
+   96   00108A   4A79 0000 1000      			TST.W	DIVIDENDO
+   97   001090   6A00 0016           			BPL	DIVDPOS		Si el dividendo es positivo, saltamos
+   98   001094   4A79 0000 1002      			TST.W	DIVISOR		Si no, el dividendo es negativo. Y hay q comprobar e
+                                                l signo del divisor
+   99   00109A   6B00 0020           			BMI	IGUALES		Si tambien es negativo, entonces ambos son iguales
+  100   00109E   4479 0000 1004      			NEG.W	COCIENTE	Si no, tenemos que invertirlos...
+  101   0010A4   6000 0016           			BRA	FINCOMP
+  Tue Sep  9 2003 03:34                                                                                                  Page    3
+
+
+
+
+  102            0000 10A8           	DIVDPOS		EQU	*		Si hemos llegado a este punto, es porque el dividend
+                                                o es positivo
+  103   0010A8   4A79 0000 1002      			TST.W	DIVISOR		Asi que, comprobamos el divisor
+  104   0010AE   6A00 000C           			BPL	IGUALES		Si tambien es positivo, son iguales, y no hay que mo
+                                                dificarlo
+  105   0010B2   4479 0000 1004      			NEG.W	COCIENTE	Si no el divisor es negativo, luego los signos son d
+                                                iferentes. Asi que hay que cambiar el signo del cociente
+  106   0010B8   6000 0002           			BRA	FINCOMP
+  107            0000 10BC           	IGUALES		EQU 	*		Si son iguales, no hay que hacer inversiones...
+  108            0000 10BC           	FINCOMP		EQU	*
+  109                                	
+  110   0010BC                       		
+  111                                	
+  112                                	* Escribir el resultado por pantalla
+  113   0010BC   4EB9 0000 0000      			JSR	ESC_RES
+  114                                	
+  115                                	* Código de finalización del programa
+  116   0010C2   103C 0009           			MOVE.B	#9,D0
+  117   0010C6   4E4F                			TRAP	#15
+  118                                	
+  119   0010C8                       			END	BEGIN
+
+
+
+           Lines Assembled :  119             Assembly Errors :  0
+
+
+

@@ -1,0 +1,54 @@
+[project]
+name=prac3b
+netlist=prac3b
+contents=prac3b
+date=02/27/03
+time=23:07:45
+version=3.1.4.05.97
+generics=MAX
+Type=XILINX8
+top_level=schematic
+lib_order=1021 133 153 1002 1011
+library_net=ON
+sim_mode=FUNC
+[libraries]
+1021=
+133=f:\fndtn\active\syslib\simprims
+153=f:\fndtn\active\syslib\xc4000e
+1002=f:\docume~1\david\misdoc~1\estruc~1\practi~1\prac0\lib\prac0
+1011=f:\docume~1\david\misdoc~1\estruc~1\xilinx\prac0\prac0\lib\prac0
+[xilinx]
+libraries=unified
+family=2
+xact8=On
+xfam=XC4000E
+[device]
+xilinx=4010EPC84-1
+part=4010EPC84-1
+[ext_sheets]
+prac3b.ucf= 
+[netlist]
+external=FALSE
+[Schematic]
+Table01=Project
+Table02=Sheet
+Table03=Date
+[sheets]
+prac3b1=
+[APP_95]
+lid=0
+oid=0
+source=F:\DOCUME~1\DAVID\MISDOC~1\ESTRUC~1\XILINX\PRACT3\PRAC3B\PRAC3B1.SCH
+[FILE7]
+scan_time=1046416911
+[Log]
+netlist.log=Simulator Netlist Log
+[OPEN32]
+nMaxFile=255
+lpstrFile=
+lpstrFilter=Schematic (*.SCH)|*.sch|All Files (*.*)|*.*||
+lpstrInitialDir=F:\DOCUME~1\DAVID\MISDOC~1\ESTRUC~1\XILINX\PRACT3\PRAC3B\
+lpstrTitle=Select Schematic Sheet
+nFilterIndex=1
+Flags=6148
+cmdLine=-h 1664 -hp 490 -m PCM_OPEN_32_MESSAGE -f F:\FNDTN\ACTIVE\PROJECTS\current.pdf

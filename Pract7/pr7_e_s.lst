@@ -1,0 +1,404 @@
+  Tue Sep  9 2003 03:34                                                                                                  Page    1
+
+
+
+
+
+
+
+               2500 A.D. 68000 Macro Assembler - Version 4.01e
+               -----------------------------------------------
+
+                       Input  Filename : PR7_E_S.ASM
+                       Output Filename : PR7_E_S.obj
+
+
+    1                                			SYMBOLS
+    2                                	
+    3                                	***************************************
+    4                                	* DEFINICIÓN DE SÍMBOLOS IMPORTADOS
+    5                                	***************************************
+    6                                			XREF	DIVIDENDO,DIVISOR,COCIENTE,RESTO
+    7                                	
+    8                                	***************************************
+    9                                	* DEFINICIÓN DE SÍMBOLOS EXPORTADOS
+   10                                	***************************************
+   11                                			XDEF	LEE_ENT,ESC_RES
+   12                                	
+   13                                	***************************************
+   14                                	* SUBRUTINA DE LECTURA DE DATOS POR TECLADO
+   15                                	***************************************
+   16            0000 0000           	LEE_ENT		EQU	*
+   17                                	* Bucle para leer el dividendo
+   18            0000 0000           	REPEAT_1	EQU	*
+   19                                	* Presentar mensaje
+   20   000000   43F9 0000 02C2      			LEA	TIRA01,A1
+   21   000006   323C 0028           			MOVE.W	#LONTIRA01,D1
+   22   00000A   103C 0001           			MOVE.B	#1,D0
+   23   00000E   4E4F                			TRAP	#15
+   24                                	* Leer número
+   25   000010   103C 0004           			MOVE.B	#4,D0
+   26   000014   4E4F                			TRAP	#15
+   27                                	* Comprobar dividendo
+   28            0000 0016           	IF_1		EQU	*
+   29   000016   0C81 FFFF 8000      			CMPI.L	#-32768,D1
+   30   00001C   6D00 0016           			BLT	ELSE_1
+   31   000020   0C81 0000 7FFF      			CMPI.L	#32767,D1
+   32   000026   6E00 000C           			BGT	ELSE_1
+   33   00002A   33C1 0000 0000      	THEN_1		MOVE.W	D1,DIVIDENDO
+   34   000030   6000 0014           			BRA	FIN_REPEAT_1
+   35   000034   43F9 0000 02EA      	ELSE_1		LEA	TIRA02,A1
+   36   00003A   323C 0029           			MOVE.W	#LONTIRA02,D1
+   37   00003E   103C 0000           			MOVE.B	#0,D0
+   38   000042   4E4F                			TRAP	#15
+   39   000044   60BA                			BRA	REPEAT_1
+   40            0000 0046           	FIN_REPEAT_1	EQU	*
+   41                                	* Bucle para leer el divisor
+   42            0000 0046           	REPEAT_2	EQU	*
+   43                                	* Presentar mensaje
+   44   000046   43F9 0000 0313      			LEA	TIRA03,A1
+   45   00004C   323C 0031           			MOVE.W	#LONTIRA03,D1
+   46   000050   103C 0001           			MOVE.B	#1,D0
+   47   000054   4E4F                			TRAP	#15
+  Tue Sep  9 2003 03:34                                                                                                  Page    2
+
+
+
+
+   48                                	* Leer número
+   49   000056   103C 0004           			MOVE.B	#4,D0
+   50   00005A   4E4F                			TRAP	#15
+   51                                	* Comprobar divisor
+   52            0000 005C           	IF_2		EQU	*
+   53   00005C   0C81 FFFF 8000      			CMPI.L	#-32768,D1
+   54   000062   6D00 001C           			BLT	ELSE_2
+   55   000066   0C81 0000 7FFF      			CMPI.L	#32767,D1
+   56   00006C   6E00 0012           			BGT	ELSE_2
+   57   000070   4A81                			TST.L	D1
+   58   000072   6700 000C           			BEQ	ELSE_2
+   59   000076   33C1 0000 0000      	THEN_2		MOVE.W	D1,DIVISOR
+   60   00007C   6000 0014           			BRA	FIN_REPEAT_2
+   61   000080   43F9 0000 02EA      	ELSE_2		LEA	TIRA02,A1
+   62   000086   323C 0029           			MOVE.W	#LONTIRA02,D1
+   63   00008A   103C 0000           			MOVE.B	#0,D0
+   64   00008E   4E4F                			TRAP	#15
+   65   000090   60B4                			BRA	REPEAT_2
+   66            0000 0092           	FIN_REPEAT_2	EQU	*
+   67                                	* Retornar
+   68   000092   4E75                			RTS
+   69                                	
+   70                                	***************************************
+   71                                	* SUBRUTINA DE ESCRITURA DE DATOS POR PANTALLA
+   72                                	***************************************
+   73            0000 0094           	ESC_RES		EQU	*
+   74                                	* Escribir resultado obtenido
+   75   000094   43F9 0000 0344      			LEA	TIRA04,A1
+   76   00009A   323C 0013           			MOVE.W	#LONTIRA04,D1
+   77   00009E   103C 0000           			MOVE.B	#0,D0
+   78   0000A2   4E4F                			TRAP	#15
+   79                                	* Escribir blancos
+   80   0000A4   43F9 0000 03F1      			LEA	BLANCOS,A1
+   81   0000AA   323C 0003           			MOVE.W	#LBLANCOS,D1
+   82   0000AE   103C 0001           			MOVE.B	#1,D0
+   83   0000B2   4E4F                			TRAP	#15
+   84                                	* Escribir dividendo
+   85   0000B4   4281                			CLR.L	D1
+   86   0000B6   3239 0000 0000      			MOVE.W	DIVIDENDO,D1
+   87   0000BC   48C1                			EXT.L	D1
+   88   0000BE   103C 0003           			MOVE.B	#3,D0
+   89   0000C2   4E4F                			TRAP	#15
+   90                                	* Escribir 'div'
+   91   0000C4   43F9 0000 036A      			LEA	TIRA06,A1
+   92   0000CA   323C 0005           			MOVE.W	#LONTIRA06,D1
+   93   0000CE   103C 0001           			MOVE.B	#1,D0
+   94   0000D2   4E4F                			TRAP	#15
+   95                                	* Escribir divisor
+   96   0000D4   4281                			CLR.L	D1
+   97   0000D6   3239 0000 0000      			MOVE.W	DIVISOR,D1
+   98   0000DC   48C1                			EXT.L	D1
+   99   0000DE   103C 0003           			MOVE.B	#3,D0
+  100   0000E2   4E4F                			TRAP	#15
+  101                                	* Escribir '='
+  102   0000E4   43F9 0000 0374      			LEA	TIRA08,A1
+  103   0000EA   323C 0003           			MOVE.W	#LONTIRA08,D1
+  104   0000EE   103C 0001           			MOVE.B	#1,D0
+  Tue Sep  9 2003 03:34                                                                                                  Page    3
+
+
+
+
+  105   0000F2   4E4F                			TRAP	#15
+  106                                	* Escribir cociente
+  107   0000F4   4281                			CLR.L	D1
+  108   0000F6   3239 0000 0000      			MOVE.W	COCIENTE,D1
+  109   0000FC   48C1                			EXT.L	D1
+  110   0000FE   103C 0003           			MOVE.B	#3,D0
+  111   000102   4E4F                			TRAP	#15
+  112                                	* Salto de línea
+  113   000104   4241                			CLR.W	D1
+  114   000106   103C 0000           			MOVE.B	#0,D0
+  115   00010A   4E4F                			TRAP	#15
+  116                                	* Escribir blancos
+  117   00010C   43F9 0000 03F1      			LEA	BLANCOS,A1
+  118   000112   323C 0003           			MOVE.W	#LBLANCOS,D1
+  119   000116   103C 0001           			MOVE.B	#1,D0
+  120   00011A   4E4F                			TRAP	#15
+  121                                	* Escribir dividendo
+  122   00011C   4281                			CLR.L	D1
+  123   00011E   3239 0000 0000      			MOVE.W	DIVIDENDO,D1
+  124   000124   48C1                			EXT.L	D1
+  125   000126   103C 0003           			MOVE.B	#3,D0
+  126   00012A   4E4F                			TRAP	#15
+  127                                	* Escribir 'mod'
+  128   00012C   43F9 0000 036F      			LEA	TIRA07,A1
+  129   000132   323C 0005           			MOVE.W	#LONTIRA07,D1
+  130   000136   103C 0001           			MOVE.B	#1,D0
+  131   00013A   4E4F                			TRAP	#15
+  132                                	* Escribir divisor
+  133   00013C   4281                			CLR.L	D1
+  134   00013E   3239 0000 0000      			MOVE.W	DIVISOR,D1
+  135   000144   48C1                			EXT.L	D1
+  136   000146   103C 0003           			MOVE.B	#3,D0
+  137   00014A   4E4F                			TRAP	#15
+  138                                	* Escribir '='
+  139   00014C   43F9 0000 0374      			LEA	TIRA08,A1
+  140   000152   323C 0003           			MOVE.W	#LONTIRA08,D1
+  141   000156   103C 0001           			MOVE.B	#1,D0
+  142   00015A   4E4F                			TRAP	#15
+  143                                	* Escribir resto
+  144   00015C   4281                			CLR.L	D1
+  145   00015E   3239 0000 0000      			MOVE.W	RESTO,D1
+  146   000164   48C1                			EXT.L	D1
+  147   000166   103C 0003           			MOVE.B	#3,D0
+  148   00016A   4E4F                			TRAP	#15
+  149                                	* Salto de línea
+  150   00016C   4241                			CLR.W	D1
+  151   00016E   103C 0000           			MOVE.B	#0,D0
+  152   000172   4E4F                			TRAP	#15
+  153                                	
+  154                                	* Calcular resultado correcto
+  155   000174   4287                			CLR.L	D7
+  156   000176   3E39 0000 0000      			MOVE.W	DIVIDENDO,D7
+  157   00017C   3C39 0000 0000      			MOVE.W	DIVISOR,D6
+  158   000182   48C7                			EXT.L	D7
+  159   000184   8FC6                			DIVS	D6,D7
+  160                                	* Escribir resultado correcto
+  161   000186   43F9 0000 0357      			LEA	TIRA05,A1
+  Tue Sep  9 2003 03:34                                                                                                  Page    4
+
+
+
+
+  162   00018C   323C 0013           			MOVE.W	#LONTIRA05,D1
+  163   000190   103C 0000           			MOVE.B	#0,D0
+  164   000194   4E4F                			TRAP	#15
+  165                                	* Escribir blancos
+  166   000196   43F9 0000 03F1      			LEA	BLANCOS,A1
+  167   00019C   323C 0003           			MOVE.W	#LBLANCOS,D1
+  168   0001A0   103C 0001           			MOVE.B	#1,D0
+  169   0001A4   4E4F                			TRAP	#15
+  170                                	* Escribir dividendo
+  171   0001A6   4281                			CLR.L	D1
+  172   0001A8   3239 0000 0000      			MOVE.W	DIVIDENDO,D1
+  173   0001AE   48C1                			EXT.L	D1
+  174   0001B0   103C 0003           			MOVE.B	#3,D0
+  175   0001B4   4E4F                			TRAP	#15
+  176                                	* Escribir 'div'
+  177   0001B6   43F9 0000 036A      			LEA	TIRA06,A1
+  178   0001BC   323C 0005           			MOVE.W	#LONTIRA06,D1
+  179   0001C0   103C 0001           			MOVE.B	#1,D0
+  180   0001C4   4E4F                			TRAP	#15
+  181                                	* Escribir divisor
+  182   0001C6   4281                			CLR.L	D1
+  183   0001C8   3239 0000 0000      			MOVE.W	DIVISOR,D1
+  184   0001CE   48C1                			EXT.L	D1
+  185   0001D0   103C 0003           			MOVE.B	#3,D0
+  186   0001D4   4E4F                			TRAP	#15
+  187                                	* Escribir '='
+  188   0001D6   43F9 0000 0374      			LEA	TIRA08,A1
+  189   0001DC   323C 0003           			MOVE.W	#LONTIRA08,D1
+  190   0001E0   103C 0001           			MOVE.B	#1,D0
+  191   0001E4   4E4F                			TRAP	#15
+  192                                	* Escribir cociente correcto
+  193   0001E6   4281                			CLR.L	D1
+  194   0001E8   3207                			MOVE.W	D7,D1
+  195   0001EA   48C1                			EXT.L	D1
+  196   0001EC   103C 0003           			MOVE.B	#3,D0
+  197   0001F0   4E4F                			TRAP	#15
+  198                                	* Salto de línea
+  199   0001F2   4241                			CLR.W	D1
+  200   0001F4   103C 0000           			MOVE.B	#0,D0
+  201   0001F8   4E4F                			TRAP	#15
+  202                                	* Escribir blancos
+  203   0001FA   43F9 0000 03F1      			LEA	BLANCOS,A1
+  204   000200   323C 0003           			MOVE.W	#LBLANCOS,D1
+  205   000204   103C 0001           			MOVE.B	#1,D0
+  206   000208   4E4F                			TRAP	#15
+  207                                	* Escribir dividendo
+  208   00020A   4281                			CLR.L	D1
+  209   00020C   3239 0000 0000      			MOVE.W	DIVIDENDO,D1
+  210   000212   48C1                			EXT.L	D1
+  211   000214   103C 0003           			MOVE.B	#3,D0
+  212   000218   4E4F                			TRAP	#15
+  213                                	* Escribir 'mod'
+  214   00021A   43F9 0000 036F      			LEA	TIRA07,A1
+  215   000220   323C 0005           			MOVE.W	#LONTIRA07,D1
+  216   000224   103C 0001           			MOVE.B	#1,D0
+  217   000228   4E4F                			TRAP	#15
+  218                                	* Escribir divisor
+  Tue Sep  9 2003 03:34                                                                                                  Page    5
+
+
+
+
+  219   00022A   4281                			CLR.L	D1
+  220   00022C   3239 0000 0000      			MOVE.W	DIVISOR,D1
+  221   000232   48C1                			EXT.L	D1
+  222   000234   103C 0003           			MOVE.B	#3,D0
+  223   000238   4E4F                			TRAP	#15
+  224                                	* Escribir '='
+  225   00023A   43F9 0000 0374      			LEA	TIRA08,A1
+  226   000240   323C 0003           			MOVE.W	#LONTIRA08,D1
+  227   000244   103C 0001           			MOVE.B	#1,D0
+  228   000248   4E4F                			TRAP	#15
+  229                                	* Escribir resto
+  230   00024A   4281                			CLR.L	D1
+  231   00024C   4847                			SWAP	D7
+  232   00024E   3207                			MOVE.W	D7,D1
+  233   000250   4847                			SWAP	D7
+  234   000252   48C1                			EXT.L	D1
+  235   000254   103C 0003           			MOVE.B	#3,D0
+  236   000258   4E4F                			TRAP	#15
+  237                                	* Salto de línea
+  238   00025A   4241                			CLR.W	D1
+  239   00025C   103C 0000           			MOVE.B	#0,D0
+  240   000260   4E4F                			TRAP	#15
+  241                                	* Comparar resultados
+  242            0000 0262           	COMP_COCIENTE	EQU	*
+  243   000262   BE79 0000 0000      			CMP.W	COCIENTE,D7
+  244   000268   6700 0016           			BEQ	COCIENTE_OK
+  245                                	* Cociente no coincide
+  246   00026C   43F9 0000 0397      			LEA	TIRA10,A1
+  247   000272   323C 0020           			MOVE.W	#LONTIRA10,D1
+  248   000276   103C 0000           			MOVE.B	#0,D0
+  249   00027A   4E4F                			TRAP	#15
+  250   00027C   6700 0012           			BEQ	COMP_RESTO
+  251                                	* Cociente coincide
+  252   000280   43F9 0000 0377      	COCIENTE_OK	LEA	TIRA09,A1
+  253   000286   323C 0020           			MOVE.W	#LONTIRA09,D1
+  254   00028A   103C 0000           			MOVE.B	#0,D0
+  255   00028E   4E4F                			TRAP	#15
+  256            0000 0290           	COMP_RESTO	EQU	*
+  257   000290   4847                			SWAP	D7
+  258   000292   BE79 0000 0000      			CMP.W	RESTO,D7
+  259   000298   6700 0016           			BEQ	RESTO_OK
+  260                                	* Resto no coincide
+  261   00029C   43F9 0000 03D4      			LEA	TIRA12,A1
+  262   0002A2   323C 001D           			MOVE.W	#LONTIRA12,D1
+  263   0002A6   103C 0000           			MOVE.B	#0,D0
+  264   0002AA   4E4F                			TRAP	#15
+  265   0002AC   6700 0012           			BEQ	COMP_FIN
+  266                                	* Resto coincide
+  267   0002B0   43F9 0000 03B7      	RESTO_OK	LEA	TIRA11,A1
+  268   0002B6   323C 001D           			MOVE.W	#LONTIRA11,D1
+  269   0002BA   103C 0000           			MOVE.B	#0,D0
+  270   0002BE   4E4F                			TRAP	#15
+  271            0000 02C0           	COMP_FIN	EQU	*
+  272                                	* Retornar
+  273   0002C0   4E75                			RTS
+  274                                	
+  275                                	
+  Tue Sep  9 2003 03:34                                                                                                  Page    6
+
+
+
+
+  276                                	***************************************
+  277                                	* ZONA DE ALMACENAMIENTO DE CONSTANTES EN TIEMPO DE EJECUCIÓN
+  278                                	***************************************
+  279                                	* Aquí definimos las variables con valor inicial, que suelen consistir
+  280                                	* en tiras de caracteres constantes utilizadas a lo largo del programa
+  281   0002C2   49 6E 74 72 6F 64   	TIRA01		DC.B	"Introduzca el dividendo [-32768,32767]: "
+                 75 7A 63 61 20 65 
+                 6C 20 64 69 76 69 
+                 64 65 6E 64 6F 20 
+                 5B 2D 33 32 37 36 
+                 38 2C 33 32 37 36 
+                 37 5D 3A 20 
+  282            0000 0028           	LONTIRA01	EQU	*-TIRA01
+  283   0002EA   45 72 72 6F 72 3A   	TIRA02		DC.B	"Error: numero incorrecto o fuera de rango"
+                 20 6E 75 6D 65 72 
+                 6F 20 69 6E 63 6F 
+                 72 72 65 63 74 6F 
+                 20 6F 20 66 75 65 
+                 72 61 20 64 65 20 
+                 72 61 6E 67 6F 
+  284            0000 0029           	LONTIRA02	EQU	*-TIRA02
+  285   000313   49 6E 74 72 6F 64   	TIRA03		DC.B	"Introduzca el divisor {[-32768,-1] U [1,32767]}: "
+                 75 7A 63 61 20 65 
+                 6C 20 64 69 76 69 
+                 73 6F 72 20 7B 5B 
+                 2D 33 32 37 36 38 
+                 2C 2D 31 5D 20 55 
+                 20 5B 31 2C 33 32 
+                 37 36 37 5D 7D 3A 
+                 20 
+  286            0000 0031           	LONTIRA03	EQU	*-TIRA03
+  287   000344   52 65 73 75 6C 74   	TIRA04		DC.B	"Resultado obtenido:"
+                 61 64 6F 20 6F 62 
+                 74 65 6E 69 64 6F 
+                 3A 
+  288            0000 0013           	LONTIRA04	EQU	*-TIRA04
+  289   000357   52 65 73 75 6C 74   	TIRA05		DC.B	"Resultado correcto:"
+                 61 64 6F 20 63 6F 
+                 72 72 65 63 74 6F 
+                 3A 
+  290            0000 0013           	LONTIRA05	EQU	*-TIRA05
+  291   00036A   20 64 69 76 20      	TIRA06		DC.B	" div "
+  292            0000 0005           	LONTIRA06	EQU	*-TIRA06
+  293   00036F   20 6D 6F 64 20      	TIRA07		DC.B	" mod "
+  294            0000 0005           	LONTIRA07	EQU	*-TIRA07
+  295   000374   20 3D 20            	TIRA08		DC.B	" = "
+  296            0000 0003           	LONTIRA08	EQU	*-TIRA08
+  297   000377   43 4F 43 49 45 4E   	TIRA09		DC.B	"COCIENTE CALCULADO CORRECTAMENTE"
+                 54 45 20 43 41 4C 
+                 43 55 4C 41 44 4F 
+                 20 43 4F 52 52 45 
+                 43 54 41 4D 45 4E 
+                 54 45 
+  298            0000 0020           	LONTIRA09	EQU	*-TIRA09
+  299   000397   45 52 52 4F 52 20   	TIRA10		DC.B	"ERROR EN EL CALCULO DEL COCIENTE"
+                 45 4E 20 45 4C 20 
+                 43 41 4C 43 55 4C 
+  Tue Sep  9 2003 03:34                                                                                                  Page    7
+
+
+
+
+                 4F 20 44 45 4C 20 
+                 43 4F 43 49 45 4E 
+                 54 45 
+  300            0000 0020           	LONTIRA10	EQU	*-TIRA10
+  301   0003B7   52 45 53 54 4F 20   	TIRA11		DC.B	"RESTO CALCULADO CORRECTAMENTE"
+                 43 41 4C 43 55 4C 
+                 41 44 4F 20 43 4F 
+                 52 52 45 43 54 41 
+                 4D 45 4E 54 45 
+  302            0000 001D           	LONTIRA11	EQU	*-TIRA11
+  303   0003D4   45 52 52 4F 52 20   	TIRA12		DC.B	"ERROR EN EL CALCULO DEL RESTO"
+                 45 4E 20 45 4C 20 
+                 43 41 4C 43 55 4C 
+                 4F 20 44 45 4C 20 
+                 52 45 53 54 4F 
+  304            0000 001D           	LONTIRA12	EQU	*-TIRA12
+  305   0003F1   20 20 20            	BLANCOS		DC.B	"   "
+  306            0000 0003           	LBLANCOS	EQU	*-BLANCOS
+  307                                	
+  308   0003F4                       			END
+
+
+
+           Lines Assembled :  308             Assembly Errors :  0
+
+
+

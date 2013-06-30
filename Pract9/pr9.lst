@@ -1,0 +1,64 @@
+  Thu Sep 11 2003 00:14                                                                                                  Page    1
+
+
+
+
+
+
+
+               2500 A.D. 68000 Macro Assembler - Version 4.01e
+               -----------------------------------------------
+
+                       Input  Filename : PR9.ASM
+                       Output Filename : PR9.obj
+
+
+    1                                			SYMBOLS
+    2                                	***************************************
+    3                                	* DEFINICIÓN DE SÍMBOLOS IMPORTADOS
+    4                                	***************************************
+    5                                			XREF		LEE_DAT,ESC_RES,FADDS
+    6                                	***************************************
+    7                                	* ZONA DE DATOS DEL PROGRAMA PRINCIPAL
+    8                                	***************************************
+    9   001000                       			ORG		$1000
+   10            0000 1000           	VAR		EQU		*
+   11   001000                       	N1		DS		4
+   12   001004                       	N2		DS		4
+   13   001008                       	RES		DS		4
+   14                                	***************************************
+   15                                	* PROGRAMA PRINCIPAL
+   16                                	***************************************
+   17                                	* Código de inicio del programa
+   18                                	*    1. Asignar etiqueta
+   19            0000 100C           	BEGIN		EQU		*
+   20                                	*    2. Iniciar puntero de pila
+   21   00100C   4FF9 0000 A000      			LEA		$0000A000,SP
+   22                                	* Pedir sumandos por teclado
+   23   001012   4879 0000 1000      			PEA		N1
+   24   001018   4879 0000 1004      			PEA		N2
+   25   00101E   4EB9 0000 0000      			JSR		LEE_DAT
+   26   001024   DFFC 0000 0008      			ADDA.L		#8,SP
+   27                                	* Sumar ambos
+   28   00102A   2F39 0000 1000      			MOVE.L		N1,-(SP)
+   29   001030   2F39 0000 1004      			MOVE.L		N2,-(SP)
+   30   001036   4879 0000 1008      			PEA		RES
+   31   00103C   4EB9 0000 0000      			JSR		FADDS
+   32   001042   DFFC 0000 000C      			ADDA.L		#12,SP
+   33                                	* Escribir el resultado por pantalla
+   34   001048   2F39 0000 1000      			MOVE.L		N1,-(SP)
+   35   00104E   2F39 0000 1004      			MOVE.L		N2,-(SP)
+   36   001054   2F39 0000 1008      			MOVE.L		RES,-(SP)
+   37   00105A   4EB9 0000 0000      			JSR		ESC_RES
+   38   001060   DFFC 0000 000C      			ADDA.L		#12,SP
+   39                                	* Código de finalización del programa
+   40   001066   103C 0009           			MOVE.B		#9,D0
+   41   00106A   4E4F                			TRAP		#15
+   42   00106C                       			END		BEGIN
+
+
+
+           Lines Assembled :  42             Assembly Errors :  0
+
+
+

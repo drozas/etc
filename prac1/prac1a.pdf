@@ -1,0 +1,57 @@
+[project]
+name=prac1a
+netlist=prac1a
+contents=prac1a
+date=01/09/03
+time=22:37:56
+version=3.1.4.05.97
+generics=MAX
+Type=XILINX8
+top_level=schematic
+library_net=ON
+sim_mode=FUNC
+lib_order=1004 133 153
+[libraries]
+1004= 
+133=c:\xilinx\active\syslib\simprims
+153=c:\xilinx\active\syslib\xc4000e
+[xilinx]
+libraries=unified
+family=2
+xact8=On
+xfam=XC4000E
+[device]
+xilinx=4003EPC84-1
+part=4003EPC84-1
+[ext_sheets]
+prac1a.ucf= 
+[netlist]
+external=FALSE
+[Schematic]
+Table01=Project
+Table02=Sheet
+Table03=Date
+[sheets]
+prac1a1=
+[Log]
+netlist.log=Simulator Netlist Log
+[timings]
+[FILE7]
+scan_time=1042181626
+[APP_95]
+lid=0
+oid=0
+source=C:\DOCUME~1\ADMINI~1.ALM\MISDOC~1\URJC\VALIDA~1\PRAC1\PRAC1A\prac1a1.sch
+[OPEN32]
+nMaxFile=255
+lpstrFile=
+lpstrFilter=Schematic (*.SCH)|*.sch|All Files (*.*)|*.*||
+lpstrInitialDir=C:\DOCUME~1\ADMINI~1.ALM\MISDOC~1\URJC\VALIDA~1\PRAC1\PRAC1A\
+lpstrTitle=Select Schematic Sheet
+nFilterIndex=1
+Flags=6148
+cmdLine=-h 1864 -hp 1090 -m PCM_OPEN_32_MESSAGE -f C:\XILINX\ACTIVE\PROJECTS\current.pdf
+[sc_desk]
+desk00=C:\DOCUME~1\ADMINI~1.ALM\MISDOC~1\URJC\VALIDA~1\PRAC1\PRAC1B\prac1b1.SCH, 66, 66, 859, 467, 1
+desk01=C:\DOCUME~1\ADMINI~1.ALM\MISDOC~1\URJC\VALIDA~1\PRAC1\PRAC101\prac1011.SCH, 44, 44, 837, 445, 0
+desk02=C:\DOCUME~1\ADMINI~1.ALM\MISDOC~1\URJC\VALIDA~1\PRAC1\PRAC1A\PRAC1A1.SCH, 0, 0, 579, 598, 0

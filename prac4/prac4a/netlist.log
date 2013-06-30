@@ -1,0 +1,18 @@
+Loading - C:\UNI\PRACETC\PRAC4\PRAC4A\prac4a.alb
+   Loading library default timing values
+Loading - FDC
+   Loading library default timing values
+Loading - M4_1E
+   Loading library default timing values
+Loading - M2_1E
+   Loading library default timing values
+Loading - M2_1
+   Loading library default timing values
+===============================
+Memory usage statistics:
+    Total number of allocated memory blocks: 142 (0)
+    Total number of memory reallocations: 3
+    Total length of memory used to load the netlist: 256 kB (0)
+    Number of system memory blocks (total/long): 1/0
+Netlist loaded in: 0 seconds
+===============================

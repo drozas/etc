@@ -1,0 +1,47 @@
+
+Global Symbol Name             Global Value     Global Filename
+
+ESC_RES                          00001104        PR9_E_S.OBJ
+FADDS                            0000120E        FADDS.OBJ
+LEE_DAT                          0000106C        PR9_E_S.OBJ
+ReadRealHex                      000014DA        ReadRealHex
+ReadString                       000015F6        ReadString
+WriteChar                        000015E8        WriteChar
+WriteLn                          000015DE        WriteLn
+WriteRealHex                     0000147C        WriteRealHex
+WriteString                      000015CE        WriteString
+
+
+******************************************************************************
+*                             L O A D      M A P                             *
+******************************************************************************
+*    Section Name              Starting Address    Ending Address    Size    *
+******************************************************************************
+* PR9.OBJ                                                                    *
+*    CODE                           00100C             00106B       000060   *
+* PR9_E_S.OBJ                                                                *
+*    CODE                           00106C             00120D       0001A2   *
+* FADDS.OBJ                                                                  *
+*    CODE                           00120E             00147B       00026E   *
+* WriteRealHex                                                               *
+*    CODE                           00147C             0014D9       00005E   *
+* ReadRealHex                                                                *
+*    CODE                           0014DA             00157B       0000A2   *
+* WriteString                                                                *
+*    CODE                           0015CE             0015DD       000010   *
+* WriteLn                                                                    *
+*    CODE                           0015DE             0015E7       00000A   *
+* WriteChar                                                                  *
+*    CODE                           0015E8             0015F5       00000E   *
+* ReadString                                                                 *
+*    CODE                           0015F6             001607       000012   *
+******************************************************************************
+
+                  Linker Output Filename : PR9.REC
+                  Disk Listing  Filename : PR9.map
+                  Symbol Table  Filename : <None Specified>
+
+
+         Link Errors :  0             Output Format :  Motorola S28
+
+

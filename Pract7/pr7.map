@@ -1,0 +1,97 @@
+
+
+
+Filename : PR7.OBJ
+
+Global Symbol Name             Global Value
+
+BEGIN                             001000
+COCIENTE                          001004
+DIVDPOS                           0010A8
+DIVIDENDO                         001000
+DIVISOR                           001002
+ELSE                              00105E
+ENDIF                             001064
+ESPOS                             001020
+ESPOS2                            00102E
+FINCOMP                           0010BC
+FINFOR                            00106C
+FOR                               001036
+I                                 001008
+IF                                001048
+IGUALES                           0010BC
+NOCAMRESTO                        00108A
+RESTO                             001006
+VAR                               001000
+
+
+
+Filename : PR7_E_S.OBJ
+
+Global Symbol Name             Global Value
+
+BLANCOS                           0014B9
+COCIENTE_OK                       001348
+COMP_COCIENTE                     00132A
+COMP_FIN                          001388
+COMP_RESTO                        001358
+ELSE_1                            0010FC
+ELSE_2                            001148
+ESC_RES                           00115C
+FIN_REPEAT_1                      00110E
+FIN_REPEAT_2                      00115A
+IF_1                              0010DE
+IF_2                              001124
+LBLANCOS                          000003
+LEE_ENT                           0010C8
+LONTIRA01                         000028
+LONTIRA02                         000029
+LONTIRA03                         000031
+LONTIRA04                         000013
+LONTIRA05                         000013
+LONTIRA06                         000005
+LONTIRA07                         000005
+LONTIRA08                         000003
+LONTIRA09                         000020
+LONTIRA10                         000020
+LONTIRA11                         00001D
+LONTIRA12                         00001D
+REPEAT_1                          0010C8
+REPEAT_2                          00110E
+RESTO_OK                          001378
+THEN_1                            0010F2
+THEN_2                            00113E
+TIRA01                            00138A
+TIRA02                            0013B2
+TIRA03                            0013DB
+TIRA04                            00140C
+TIRA05                            00141F
+TIRA06                            001432
+TIRA07                            001437
+TIRA08                            00143C
+TIRA09                            00143F
+TIRA10                            00145F
+TIRA11                            00147F
+TIRA12                            00149C
+
+
+******************************************************************************
+*                             L O A D      M A P                             *
+******************************************************************************
+*    Section Name              Starting Address    Ending Address    Size    *
+******************************************************************************
+* PR7.OBJ                                                                    *
+*    CODE                           001000             0010C7       0000C8   *
+* PR7_E_S.OBJ                                                                *
+*    CODE                           0010C8             0014BB       0003F4   *
+******************************************************************************
+
+                  Linker Output Filename : PR7.REC
+                  Disk Listing  Filename : PR7.map
+                  Symbol Table  Filename : PR7.sym
+                                Format   : Microtek
+
+
+         Link Errors :  0             Output Format :  Motorola S28
+
+

@@ -1,0 +1,58 @@
+[project]
+name=prac2
+netlist=prac2
+contents=prac2
+date=01/09/03
+time=23:26:28
+version=3.1.4.05.97
+generics=MAX
+Type=XILINX8
+top_level=schematic
+library_net=ON
+sim_mode=FUNC
+lib_order=1005 133 153
+[libraries]
+1005= 
+133=c:\xilinx\active\syslib\simprims
+153=c:\xilinx\active\syslib\xc4000e
+[xilinx]
+libraries=unified
+family=2
+xact8=On
+xfam=XC4000E
+[device]
+xilinx=4003EPC84-1
+part=4003EPC84-1
+[ext_sheets]
+prac2a.ucf= 
+[netlist]
+external=FALSE
+[Schematic]
+Table01=Project
+Table02=Sheet
+Table03=Date
+[sheets]
+prac21=
+[Log]
+netlist.log=Simulator Netlist Log
+[timings]
+prac2a=
+[OPEN32]
+nMaxFile=10000
+lpstrFile=
+lpstrFilter=Schematic (*.SCH)|*.sch|All Files (*.*)|*.*||
+lpstrInitialDir=C:\DOCUME~1\ADMINI~1.ALM\MISDOC~1\URJC\ETC1\PRACT2\PRAC2A
+lpstrTitle=Add Document
+nFilterIndex=0
+Flags=530964
+HelpID=10380
+HelpFileName=C:\XILINX\ACTIVE\EXE\PCM.HLP
+cmdLine=-h 1190 -hp 1114 -m PCM_OPEN_32_MESSAGE -f C:\XILINX\ACTIVE\PROJECTS\current.pdf
+[APP_95]
+lid=0
+oid=0
+source=C:\DOCUME~1\ADMINI~1.ALM\MISDOC~1\URJC\ETC1\PRACT2\PRAC2\prac21.sch
+[FILE7]
+scan_time=1042184453
+[sc_desk]
+desk00=C:\DOCUME~1\ADMINI~1.ALM\MISDOC~1\URJC\ETC1\PRACT2\PRAC2\PRAC21.SCH, 0, 0, 602, 314, 1

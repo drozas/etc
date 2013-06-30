@@ -1,0 +1,38 @@
+
+
+
+Filename : pr63.obj
+
+Global Symbol Name             Global Value
+
+EXTERIOR                          000542
+FINCOMP                           000556
+INICIO                            000500
+INTERIOR                          00054E
+POSICION                          00040A
+R                                 000404
+XC                                000400
+XZ                                000406
+YC                                000402
+YZ                                000408
+
+
+******************************************************************************
+*                             L O A D      M A P                             *
+******************************************************************************
+*    Section Name              Starting Address    Ending Address    Size    *
+******************************************************************************
+* pr63.obj                                                                   *
+*    CODE                           000400             000409       00000A   *
+*                                   000500             000559       00005A   *
+******************************************************************************
+
+                  Linker Output Filename : pr63.rec
+                  Disk Listing  Filename : pr63.map
+                  Symbol Table  Filename : pr63.sym
+                                Format   : Microtek
+
+
+         Link Errors :  0             Output Format :  Motorola S28
+
+

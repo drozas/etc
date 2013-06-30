@@ -1,0 +1,49 @@
+  Thu Sep  4 2003 13:44                                                                                                  Page    1
+
+
+
+
+
+
+
+               2500 A.D. 68000 Macro Assembler - Version 4.01e
+               -----------------------------------------------
+
+                       Input  Filename : pr61.asm
+                       Output Filename : pr61.obj
+
+
+    1                                	* Programa principal
+    2                                			SYMBOLS
+    3   000400                       			ORG	$400
+    4   000400   3039 0000 1002      	INICIO		MOVE.W	B,D0		D0.W:=M(B)
+    5   000406   D179 0000 1004      			ADD.W	D0,C		D0.W:=D0.W+M(C)
+    6   00040C   C1F9 0000 1000      	                                    MULS.W  A,D0                           D0:=D0*M(A)
+    7   000412   81FC 0014           	                                    DIVS.W  #20,D0                         D0:=D0/20
+    8   000416   D079 0000 1000      			ADD.W	A,D0		D0.W:=D0.W+M(A)
+    9   00041C   3239 0000 1004      			MOVE.W	C,D1		D1.W:=M(C)
+   10   000422   C3F9 0000 1006      	                                    MULS.W  D,D1                           D1.L:=D1.W*D
+   11   000428   9081                			SUB.L	D1,D0		D0.L:=D0.L-D1.L
+   12   00042A   23C0 0000 1008      			MOVE.L	D0,E		E:=D0.L
+   13   000430   6C00 000E           			BGE	POSITIVO	Saltar si M(E)>=0
+   14   000434   13FC 002D 0000 100C 	NEGATIVO	MOVE.B	#'-',SIGNO	M(SIGNO):="-"
+   15   00043C   6000 000A           			BRA	FIN_SI		Saltar a fin_si
+   16   000440   13FC 002B 0000 100C 	POSITIVO	MOVE.B	#'+',SIGNO	M(SIGNO):="+"
+   17   000448   4E72 2000           	FIN_SI		STOP	#$2000		Parar
+   18                                	
+   19                                	* Zona de datos del programa principal
+   20   001000                       			ORG	$1000
+   21   001000   2711                	A		DW	10001
+   22   001002   FFE2                	B		DW	-30
+   23   001004   FFFB                	C		DW	-5
+   24   001006   0037                	D		DW	55
+   25   001008                       	E		DS	4
+   26   00100C                       	SIGNO		DS	1
+   27   00100D                       			END	INICIO
+
+
+
+           Lines Assembled :  27             Assembly Errors :  0
+
+
+

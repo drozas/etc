@@ -1,0 +1,63 @@
+  Tue Sep  9 2003 08:36                                                                                                  Page    1
+
+
+
+
+
+
+
+               2500 A.D. 68000 Macro Assembler - Version 4.01e
+               -----------------------------------------------
+
+                       Input  Filename : PR8.ASM
+                       Output Filename : PR8.obj
+
+
+    1                                			SYMBOLS
+    2                                	***************************************
+    3                                	* DEFINICIÓN DE SÍMBOLOS IMPORTADOS
+    4                                	***************************************
+    5                                			XREF		LEE_DAT,ESC_RES,ORD_VECT
+    6                                	***************************************
+    7                                	* ZONA DE DATOS DEL PROGRAMA PRINCIPAL
+    8                                	***************************************
+    9   001000                       			ORG		$1000
+   10            0000 1000           	CONST		EQU		*
+   11            0000 0010           	N		EQU		16
+   12            0000 0004           	TAM_ELEM	EQU		4
+   13            0000 1000           	VAR		EQU		*
+   14   001000                       	VECTOR		DS		N*TAM_ELEM
+   15                                	***************************************
+   16                                	* PROGRAMA PRINCIPAL
+   17                                	***************************************
+   18                                	* Código de inicio del programa
+   19                                	*    1. Asignar etiqueta
+   20            0000 1040           	BEGIN		EQU		*
+   21                                	*    2. Iniciar puntero de pila
+   22   001040   4FF9 0000 A000      			LEA		$0000A000,SP
+   23                                	* Pedir el vector por teclado
+   24   001046   4879 0000 1000      			PEA		VECTOR
+   25   00104C   3F3C 0010           			MOVE.W		#N,-(SP)
+   26   001050   4EB9 0000 0000      			JSR		LEE_DAT
+   27   001056   DFFC 0000 0006      			ADDA.L		#6,SP
+   28                                	* Ordenar el vector
+   29   00105C   4879 0000 1000      			PEA		VECTOR
+   30   001062   3F3C 0010           			MOVE.W		#N,-(SP)
+   31   001066   4EB9 0000 0000      			JSR		ORD_VECT
+   32   00106C   DFFC 0000 0006      			ADDA.L		#6,SP
+   33                                	* Escribir el vector ordenado por pantalla
+   34   001072   4879 0000 1000      			PEA		VECTOR
+   35   001078   3F3C 0010           			MOVE.W		#N,-(SP)
+   36   00107C   4EB9 0000 0000      			JSR		ESC_RES
+   37   001082   DFFC 0000 0006      			ADDA.L		#6,SP
+   38                                	* Código de finalización del programa
+   39   001088   103C 0009           			MOVE.B		#9,D0
+   40   00108C   4E4F                			TRAP		#15
+   41   00108E                       			END		BEGIN
+
+
+
+           Lines Assembled :  41             Assembly Errors :  0
+
+
+

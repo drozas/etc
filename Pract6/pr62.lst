@@ -1,0 +1,56 @@
+  Sat Aug 30 2003 19:33                                                                                                  Page    1
+
+
+
+
+
+
+
+               2500 A.D. 68000 Macro Assembler - Version 4.01e
+               -----------------------------------------------
+
+                       Input  Filename : PR62.ASM
+                       Output Filename : PR62.obj
+
+
+    1                                	* Programa principal
+    2                                			SYMBOLS
+    3   000400                       			ORG	$400
+    4   000400                       	INICIO
+    5   000400   4280                	                CLR.L   D0              Borramos el contenido de los registros
+    6   000402   4281                	                CLR.L   D1
+    7   000404   4282                	                CLR.L   D2
+    8   000406   4283                	                CLR.L   D3
+    9   000408   3039 0000 1002      	                MOVE.W  B,D0            D0.W:=M(B)
+   10   00040E   D079 0000 1004      	                ADD.W   C,D0            D0.W:=D0.W+M(C)
+   11   000414   3239 0000 1000      	                MOVE.W  A,D1            D1.W:=M(A)
+   12   00041A   C3C0                	                MULS.W  D0,D1           D1.L:=D1.W*D0.W
+   13   00041C   3439 0000 1000      	                MOVE.W  A,D2            D2.W:=M(A)
+   14   000422   83FC 0014           	                DIVS.W  #20,D1          D1.L:=D1.W/20
+   15   000426   D242                	                ADD.W   D2,D1           D1.W:=D2.W+D1.W
+   16   000428   3639 0000 1004      	                MOVE.W  C,D3            D3.W:=M(C)
+   17   00042E   C7F9 0000 1006      	                MULS.W  D,D3            D3.L:=D*D3.W
+   18   000434   9283                	                SUB.L  D3,D1           D1.L:=D1.L-D3.L
+   19   000436   23C1 0000 1008      	                MOVE.L  D1,E            M(E):=D1
+   20   00043C   13F8 002D 0000 100C 	                MOVE.B  '-',SIGNO       SIGNO:='-'
+   21   000444   4A81                	                TST.L   D1
+   22   000446   6B00 000A           	                BMI     ESNEG           Si es negativo ya tiene el signo, si no hay q cambia
+                                                rlo
+   23   00044A   13F8 002B 0000 100C 	                MOVE.B  '+',SIGNO
+   24            0000 0452           	ESNEG           EQU     *
+   25                                	* Zona de datos del programa principal
+   26   001000                       			ORG	$1000
+   27   001000   2711                	A		DW	10001
+   28   001002   FFE2                	B		DW	-30
+   29   001004   FFFB                	C		DW	-5
+   30   001006   0037                	D		DW	55
+   31   001008                       	E		DS	4
+   32   00100C                       	SIGNO		DS	1
+   33   00100D                       			END	INICIO
+
+
+
+           Lines Assembled :  33             Assembly Errors :  0
+
+
+

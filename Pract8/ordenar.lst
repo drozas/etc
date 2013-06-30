@@ -1,0 +1,92 @@
+  Tue Sep  9 2003 08:36                                                                                                  Page    1
+
+
+
+
+
+
+
+               2500 A.D. 68000 Macro Assembler - Version 4.01e
+               -----------------------------------------------
+
+                       Input  Filename : ORDENAR.ASM
+                       Output Filename : ORDENAR.obj
+
+
+    1                                			SYMBOLS
+    2                                	
+    3                                	***************************************
+    4                                	* DEFINICIÓN DE SÍMBOLOS EXPORTADOS
+    5                                	***************************************
+    6                                			XDEF	ORD_VECT
+    7                                	* Registros:
+    8                                	* - A0: se mantiene durante toda la subrutina apuntando al primer elemento del vector
+    9                                	* - A1: apunta al elemento 'X' del vector
+   10                                	* - A2: apunta al elemento 'X+1' del vector
+   11                                	* - D0: Contiene el numero de elementos
+   12                                	* - D1: Actúa en la subrutina como indice del bucle externo
+   13                                	* - D2: Actúa en la subrutina como indice del bucle interno
+   14                                	* - D3 y D4: Almacenan temporalmente los valores del vector, para su comparacion y posible i
+                                                ntercambio
+   15                                	
+   16                                	
+   17                                	***************************************
+   18                                	* SUBRUTINA DE ORDENACIÓN DE UN VECTOR DE TAMAÑO POTENCIA DE 2 MEDIANTE ALGORITMO DEL MÉTODO
+                                                 BURBUJA
+   19                                	***************************************
+   20            0000 0000           	ORD_VECT	EQU	*
+   21   000000   206F 0006           			MOVEA.L	6(SP),A0	Apuntamos con el puntero A0 al vector
+   22   000004   302F 0004           			MOVE.W	4(SP),D0	Metemos en D0 el numero de elementos
+   23   000008   5340                			SUB.W	#1,D0		Restamos 1 al numero de elementos (los bucles son ha
+                                                sta N-1)
+   24   00000A   4281                			CLR.L	D1		Inicializamos D1, que será el indice i 
+   25                                	* Bucle externo:
+   26            0000 000C           	FOR1		EQU	*
+   27   00000C   B240                			CMP.W	D0,D1		
+   28   00000E   6200 003A           			BHI	FINFOR1		Si D1 es mayor que N-1 elementos, salimos del bucle 
+                                                externo
+   29   000012   4282                			CLR.L	D2		Inicializamos D2, que será el indice j
+   30   000014   2248                			MOVEA.L	A0,A1		Ponemos los punteros A1 apuntando al primer elemento
+                                                 del vector
+   31   000016   2448                			MOVEA.L	A0,A2		Apuntamos con A2 al vector
+   32   000018   D5FC 0000 0004      			ADDA.L	#4,A2		Apuntamos al segundo elemento del vector [A1 apuntar
+                                                a al elemento 'X', y A2 al 'X+1']
+   33                                	* Bucle interno
+   34            0000 001E           	FOR2		EQU	*
+   35   00001E   4283                			CLR.L	D3		Inicializamos los registros D3 y D4. Aquí se almacen
+                                                aran temporalmente los valores del vector, para su comparación
+   36   000020   4284                			CLR.L	D4		
+   37   000022   B440                			CMP.W	D0,D2
+   38   000024   6200 0020           			BHI	FINFOR2		Si D2 (indice j) es mayor que N-1 elementos, salimos
+                                                 del bucle interno
+   39   000028   2611                			MOVE.L	(A1),D3		Metemos el elemento de posicion 'X' en D3
+  Tue Sep  9 2003 08:36                                                                                                  Page    2
+
+
+
+
+   40   00002A   2812                			MOVE.L	(A2),D4		Y el elemento de posicion 'X+1' en D4
+   41   00002C   B684                			CMP.L	D4,D3
+   42   00002E   6F00 0006           			BLE	NOINTER		Si [X]<=[X+1], entonces ya está ordenado
+   43   000032   2284                			MOVE.L	D4,(A1)		Y si no hay que intercambiarlo
+   44   000034   2483                			MOVE.L	D3,(A2)
+   45            0000 0036           	NOINTER		EQU	*
+   46   000036   D3FC 0000 0004      			ADDA.L	#4,A1		Haya o no intercambio, hay que aumentar los punteros
+                                                
+   47   00003C   D5FC 0000 0004      			ADDA.L	#4,A2
+   48   000042   5242                			ADD.W	#1,D2		Y el indice j
+   49   000044   60D8                			BRA	FOR2
+   50            0000 0046           	FINFOR2		EQU	*
+   51   000046   5241                			ADD.W	#1,D1		Y cuando salgamos del bucle interno; hay que aumenta
+                                                r también el índice el bucle externo
+   52   000048   60C2                			BRA	FOR1
+   53            0000 004A           	FINFOR1		EQU	*
+   54   00004A   4E75                			RTS
+   55   00004C                       			END
+
+
+
+           Lines Assembled :  55             Assembly Errors :  0
+
+
+

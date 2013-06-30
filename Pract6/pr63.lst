@@ -1,0 +1,77 @@
+  Tue Sep  2 2003 20:43                                                                                                  Page    1
+
+
+
+
+
+
+
+               2500 A.D. 68000 Macro Assembler - Version 4.01e
+               -----------------------------------------------
+
+                       Input  Filename : pr63.asm
+                       Output Filename : pr63.obj
+
+
+    1                                	* Declaración de variables 
+    2                                	
+    3   000400                       			ORG	$400		
+    4   000400   0064                	XC		DW	100		Coordenada X del centro de la circunferencia
+    5   000402   0078                	YC		DW	120		Coordenada Y del centro de la circunferencia
+    6   000404   00AF                	R		DW	175		Radio
+    7   000406   0037                	XZ		DW	55		Coordenada X del punto Z	
+    8   000408   002D                	YZ		DW	45		Coordenada Y del punto Z		
+    9   00040A                       	POSICION	DS	0
+   10                                			SYMBOLS
+   11                                	
+   12                                	* Registros:
+   13                                	* - D0:  sqr(XC-Xz)
+   14                                	* - D1:  sqr(YC-YZ)
+   15                                	* - D2:  sqr(R)		
+   16                                	
+   17                                	
+   18                                	* Programa principal
+   19   00040A                       			
+   20   000500                       			ORG	$500
+   21   000500   4280                	INICIO		CLR.L	D0		Borramos contenido de los registros
+   22   000502   4281                			CLR.L	D1
+   23   000504   4282                			CLR.L	D2
+   24                                	* Primero realizamos todos los calculos necesarios...
+   25   000506   3039 0000 0400      			MOVE.W	XC,D0
+   26   00050C   3239 0000 0402      			MOVE.W	YC,D1
+   27   000512   9079 0000 0406      			SUB.W	XZ,D0
+   28   000518   9279 0000 0408      			SUB.W	YZ,D1
+   29   00051E   C1C0                			MULS	D0,D0
+   30   000520   C3C1                			MULS	D1,D1
+   31   000522   D081                			ADD.L	D1,D0
+   32   000524   3439 0000 0404      			MOVE.W	R,D2
+   33   00052A   C5C2                			MULS	D2,D2
+   34                                	* Ahora en D0 tenemos el resultado total de las operaciones; en D2 el radio al cuadrado,  y 
+                                                solo nos queda comparar...
+   35   00052C   B082                			CMP.L	D2,D0
+   36   00052E   6E00 0012           			BGT	EXTERIOR
+   37   000532   6D00 001A           			BLT	INTERIOR
+   38                                	*Si no es exterior ni interior, entonces esta sobre la circunferencia...
+   39   000536   13FC 0050 0000 040A 			MOVE.B	#'P',POSICION	Colocamos una P y saltamos
+   40   00053E   6000 0016           			BRA	FINCOMP
+   41            0000 0542           	EXTERIOR	EQU	*
+   42   000542   13FC 0045 0000 040A 			MOVE.B	#'E',POSICION	Si es exterior colocamos una E y saltamos
+   43   00054A   6000 000A           			BRA	FINCOMP
+   44            0000 054E           	INTERIOR	EQU	*
+   45   00054E   13FC 0049 0000 040A 			MOVE.B	#'I',POSICION	Y si es interior colocamos una I
+   46            0000 0556           	FINCOMP		EQU	*
+  Tue Sep  2 2003 20:43                                                                                                  Page    2
+
+
+
+
+   47   000556   4E72 2000           			STOP	#$2000		Parar
+   48                                	
+   49   00055A                       			END	INICIO
+
+
+
+           Lines Assembled :  49             Assembly Errors :  0
+
+
+

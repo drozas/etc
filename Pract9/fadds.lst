@@ -1,0 +1,419 @@
+  Thu Sep 11 2003 00:14                                                                                                  Page    1
+
+
+
+
+
+
+
+               2500 A.D. 68000 Macro Assembler - Version 4.01e
+               -----------------------------------------------
+
+                       Input  Filename : FADDS.ASM
+                       Output Filename : FADDS.obj
+
+
+    1                                	***************************************
+    2                                	* Subrutina FADDS: emula el comportamiento del coprocesador M68882, permitiendo la
+    3                                	* suma de numeros en coma flotante, con el estandar IEE754
+    4                                	***************************************
+    5                                	
+    6                                		SYMBOLS
+    7                                	
+    8                                	***************************************
+    9                                	* DEFINICIÓN DE SÍMBOLOS EXPORTADOS
+   10                                	*************************************
+   11                                			XDEF	FADDS
+   12                                	
+   13                                	***************************************
+   14                                	* SUBRUTINA DE SUMA DE DOS NÚMEROS EN COMA FLOTANTE IEEE 754 DE PRECISIÓN SIMPLE
+   15                                	***************************************
+   16            0000 0000           	FADDS		EQU	*
+   17                                	* Parámetros
+   18            0000 0010           	FADDS_SUM1	SET	16
+   19            0000 000C           	FADDS_SUM2	SET	12
+   20            0000 0008           	FADDS_RES	SET	8
+   21                                	* Variables locales: se reserva espacio mediante la instrucción link
+   22            FFFF FFFF           	EXP_S1		EQU     -1
+   23            FFFF FFFE           	EXP_S2		EQU     -2
+   24            FFFF FFFA           	MAN_S1		EQU	-6
+   25            FFFF FFF6           	MAN_S2		EQU	-10
+   26   000000                       	                                            
+   27   000000   4E56 FFF6           	                LINK A6,#-10                	Preparamos marco de pila
+   28                                	* Descomposición del primer sumando en IEE754 en sus campos:
+   29                                	
+   30   000004   48E7 F800           			MOVEM.L D0-D4,-(SP)		Salvaguardamos los registros
+   31   000008   2F2E 0010           	                MOVE.L  FADDS_SUM1(A6),-(SP)	Metemos el sumando1 en la pila
+   32   00000C   486E FFFA           	                PEA     MAN_S1(A6)		En MAN_S1 se guardara la mantisa del primero
+                                                , una vez descompuesto
+   33   000010   486E FFFF           	                PEA     EXP_S1(A6)		Y en EXP_S1 el exponente, una vez descompues
+                                                to
+   34   000014   4EB9 0000 00E4      	                JSR     FSPLITS			Y llamamos a FSPLITS, para descomponerlo
+   35   00001A   DFFC 0000 000C      	                ADDA.L  #12,SP			Limpiamos la pila
+   36                                	
+   37                                	* Descomposición del segundo sumando en IEE754 en sus campos:
+   38                                	
+   39   000020   2F2E 000C           	                MOVE.L  FADDS_SUM2(A6),-(SP)	Metemos el sumando2 en la pila
+   40   000024   486E FFF6           	                PEA     MAN_S2(A6)		En MAN_S2 se guardara la mantisa del segundo
+                                                
+   41   000028   486E FFFE           	                PEA     EXP_S2(A6)		En EXP_S2 la exponente del segundo
+   42   00002C   4EB9 0000 00E4      	                JSR     FSPLITS			Llamada a FSPLITS, para descomponerlo
+   43   000032   DFFC 0000 000C      	                ADDA.L  #12,SP			Y limpiamos la pila.
+   44                                	
+  Thu Sep 11 2003 00:14                                                                                                  Page    2
+
+
+
+
+   45                                	* Transformaciones de formato en los exponentes: 
+   46                                	
+   47   000038   142E FFFF           	                MOVE.B  EXP_S1(A6),D2		Movemos el exponente1 a D2 (donde se tiene q
+                                                ue albergar para la subrutina
+   48   00003C   4EB9 0000 0180      	                JSR     E127_C2_B		Lo transformamos A C2
+   49   000042   3E02                	                MOVE.W  D2,D7			Y lo guardamos temporalmente en D7 (.w, porq
+                                                ue es el tamaño en el q se devuelve)
+   50   000044   142E FFFE           	                MOVE.B  EXP_S2(A6),D2		Movemos el exponente2 a D2 (donde se tiene q
+                                                ue albergar para la subrutina)
+   51   000048   4EB9 0000 0180      	                JSR     E127_C2_B		Lo tranformamos a C2
+   52   00004E   3602                			MOVE.W	D2,D3			Guardamos el exponente del S2 en D3.W
+   53   000050   3407                			MOVE.W	D7,D2			Y el exponente del S1 en D3
+   54                                	
+   55                                	* Movimiento de las mantisas a los registros:
+   56   000052   202E FFFA           	                MOVE.L  MAN_S1(A6),D0		Guardamos la primera mantisa en D0
+   57   000056   222E FFF6           	                MOVE.L  MAN_S2(A6),D1		Y la segunda en D1
+   58                                	
+   59                                	* Llegados a este punto, el contenido de los registros es:
+   60                                	* D0.L-> mantisa del N1; D1.L-> mantisa del N2; D2.W-> exponente del N1; D3.W-> exponente de
+                                                l N2
+   61                                	
+   62                                	* Comparación de exponentes:
+   63   00005A   B443                	                CMP.W   D3,D2 
+   64   00005C   6C00 000E           	                BGE     EXP1_MAYOR		Si el primer exponente es mayor o igual, sal
+                                                tamos.
+   65   000060   2800                	                MOVE.L  D0,D4			Si no, intercambiamos las mantisas utilizand
+                                                o D4 como auxiliar.
+   66   000062   2001                	                MOVE.L  D1,D0
+   67   000064   2204                	                MOVE.L  D4,D1
+   68   000066   3803                	                MOVE.W  D3,D4			E intercambiamos los exponentes: usando D4 d
+                                                e nuevo como auxiliar
+   69   000068   3602                	                MOVE.W  D2,D3
+   70   00006A   3404                	                MOVE.W  D4,D2
+   71                                	
+   72                                	* Llegados a este punto, el contenido de los registros es:
+   73                                	* D0.L -> mantisa del num de mayor exponente; D1.L -> mantisa del num de menor exponente;
+   74                                	* D2.W -> exponente del num de mayor exponente; D3.W -> exponente del num de menor exponente
+                                                
+   75                                	
+   76            0000 006C           	EXP1_MAYOR      EQU	*
+   77   00006C   3802                			MOVE.W  D2,D4               	Movemos D2 a D4
+   78   00006E   0C03 0080           	                CMPI.B  #$80,D3             	Comprobamos el exponente del menor, para ver
+                                                 si es un infinito o un NAN
+   79   000072   6600 0008           	                BNE     NI_INF_NI_NAN       	Si no lo es, saltamos 
+   80   000076   3403                	                MOVE.W  D3,D2               	Si es un NAN, movemos el exponente a D2
+   81   000078   6000 0048           	                BRA     COMPONER_RES        	Y saltamos para componer el resultado
+   82            0000 007C           	NI_INF_NI_NAN	EQU	*
+   83   00007C   0284 0000 FFFF      	                AND.L   #$0000FFFF,D4       	Borramos los bits a 0 de D4
+   84   000082   9843                	                SUB.W   D3,D4               	Obtenemos la diferencia de exponentes
+   85   000084   5344                	                SUB.W   #1,D4               	Y le restamos uno
+   86   000086   6D00 0014           	                BLT     FIN_ALIN          	Si es menor que 0, no hay que alinear
+   87   00008A   4EB9 0000 0238      	                JSR     SALV_SIGN_L       	Y si hay que desplazar, guardamos el signo
+   88            0000 0090           	FOR_ALIN	EQU	*
+   89   000090   E289                	                LSR.L   D1              	Desplazamos la mantisa del menor
+   90   000092   51CC FFFC           	                DBF     D4,FOR_ALIN     	
+   91   000096   4EB9 0000 0252      	                JSR     RES_SIG_L       	Llamamos a RES_SIG_L
+   92            0000 009C           	FIN_ALIN	EQU	*
+  Thu Sep 11 2003 00:14                                                                                                  Page    3
+
+
+
+
+   93   00009C   2800                	                MOVE.L  D0,D4           	Movemos D0 a D4
+   94   00009E   4EB9 0000 0170      	                JSR     MS_C2_B         	LLamamos a MS_C2_B
+   95   0000A4   2001                	                MOVE.L  D1,D0           	Movemos D1 a D0
+   96   0000A6   2204                	                MOVE.L  D4,D1           	Movemos D4 a D1
+   97   0000A8   4EB9 0000 0170      	                JSR     MS_C2_B         	Llamamos a MS_C2_b
+   98   0000AE   D280                	                ADD.L   D0,D1           	Sumamos, y ya tenemos en D1 la mantisa
+   99   0000B0   4EB9 0000 0170      	                JSR     MS_C2_B         	Llamamos a MS_C2_B
+  100                                	
+  101                                	* Normalización y redondeo de mantisa
+  102   0000B6   4EB9 0000 0192      	                JSR     NORM_MANT_L     
+  103   0000BC   4EB9 0000 0200      	                JSR     ROUND_MANT_L    
+  104                                	
+  105                                	* Llegados a este punto se procede a la recomposición del numero.
+  106                                	* El contenido de los registros es: D2.W-> exponente del resultado (en C2!); D1.L-> mantisa 
+                                                del resultado
+  107            0000 00C2           	COMPONER_RES    EQU	*
+  108   0000C2   4EB9 0000 018A      			JSR     C2_E127_B       	Tenemos que pasar el exponente a Ea127
+  109   0000C8   2F01                	                MOVE.L  D1,-(SP)        	Guardamos la mantisa en la pila
+  110   0000CA   3F02                	                MOVE.W  D2,-(SP)       		Guardamos el exponente en la pila
+  111   0000CC   2F2E 0008           	                MOVE.L  FADDS_RES(A6),-(SP)  	Metemos en la pila la variable resultado
+  112   0000D0   4EB9 0000 0142      	                JSR     FMERGES         	Hacemos la llamada a la subrutina de recompo
+                                                sicion
+  113   0000D6   DFFC 0000 000A      	                ADDA.L  #10,SP         		Limpiamos la pila 
+  114   0000DC   4CDF 001F           	                MOVEM.L (SP)+,D0-D4     	Recuperamos los registros
+  115   0000E0   4E5E                	                UNLK    A6              	Cerramos el marco de pila
+  116   0000E2   4E75                			RTS
+  117   0000E4                       	                
+  118                                	**********************
+  119                                	*
+  120                                	*A continuación se incluye el código de las subrutinas FSPLITS y FMERGES
+  121                                	* No es obligatorio usarlas si no se desea
+  122                                	*
+  123                                	**********************
+  124                                	**********************
+  125                                	*
+  126                                	*PROCEDIMIENTO PARA DESCOMPONER UN NUMERO EN IEEE 754 DE PRECISIÓN SIMPLE
+  127                                	* DADO EN NOTACIÓN COMPACTA HEXADECIMAL EN SUS CAMPOS DE MANTISA Y EXPONENTE
+  128                                	*
+  129                                	**********************
+  130                                	* Argumentos
+  131                                	*   1: número en binario con todos sus campos (4 octetos)
+  132                                	* 2: dirección donde se guardarán la mantisa y el signo en módulo y signo (4 octetos)
+  133                                	*   3: dirección donde se almacenará el exponente en exceso a 127 (4 octetos)
+  134                                	*********************
+  135                                	* La mantisa ocupará 32 bits, y estará en la forma s0X'bbbbbbb...b, donde
+  136                                	*     s es el bit de signo
+  137                                	*   X es el bit de la parte entera (si la mantisa está normalizada, X=1;
+  138                                	*                                     si está sin normalizar, X=0)
+  139                                	*     Hay 29 dígitos fraccionarios
+  140                                	**********************
+  141            0000 00E4           	FSPLITS         EQU     *
+  142            0000 0010           	COMPACTO        SET     16
+  143            0000 000C           	MANTISA         SET     12
+  144            0000 0008           	EXPONENTE       SET     8
+  145   0000E4   4E56 0000           	                LINK    A6,#0
+  146   0000E8   48E7 0F04           			MOVEM.L	A5/D4/D5/D6/D7,-(SP)
+  147                                	* Extraer exponente y ponerlo en D7
+  Thu Sep 11 2003 00:14                                                                                                  Page    4
+
+
+
+
+  148   0000EC   2E2E 0010           			MOVE.L	COMPACTO(A6),D7
+  149   0000F0   0287 7F80 0000      			ANDI.L	#$7F800000,D7
+  150   0000F6   7A17                			MOVE.L	#23,D5
+  151   0000F8   EAAF                			LSR.L	D5,D7
+  152                                	* Extraer modulo de la mantisa y ponerlo en D6 y D5
+  153   0000FA   2C2E 0010           			MOVE.L	COMPACTO(A6),D6
+  154   0000FE   0286 007F FFFF      			ANDI.L	#$007FFFFF,D6
+  155   000104   ED8E                			LSL.L	#6,D6
+  156   000106   2A06                			MOVE.L	D6,D5
+  157                                	* Poner bit de signo si el número es negativo
+  158   000108   282E 0010           			MOVE.L	COMPACTO(A6),D4
+  159   00010C   0804 001F           			BTST	#31,D4
+  160   000110   6700 0006           			BEQ	TST_EXP
+  161   000114   08C6 001F           			BSET	#31,D6
+  162                                	* Si el exponente es nulo, estamos ante un caso especial
+  163            0000 0118           	TST_EXP		EQU	*
+  164   000118   4A07                			TST.B	D7
+  165   00011A   6600 000E           			BNE	EXP_NO_NULO
+  166                                	*Si el exponente es nulo y la mantisa también, devolvemos todo a 0 excepto quiza el signo
+  167            0000 011E           	EXP_NULO	EQU	*
+  168   00011E   4A85                			TST.L	D5
+  169   000120   6700 000C           			BEQ	SEGUIR
+  170                                	*Si el exponente es nulo y la mantisa no, sumamos 1 al exponente para dejarlo en E127
+  171   000124   5207                			ADDQ.B	#1,D7
+  172   000126   6000 0006           			BRA	SEGUIR
+  173                                	* Si el exponente es no nulo, añadir bit implícito en la mantisa
+  174            0000 012A           	EXP_NO_NULO	EQU	*
+  175   00012A   08C6 001D           			BSET	#29,D6
+  176                                	* Actualizar parametros de salida
+  177   00012E   2A6E 000C           	SEGUIR		MOVEA.L	MANTISA(A6),A5
+  178   000132   2A86                			MOVE.L	D6,(A5)
+  179   000134   2A6E 0008           			MOVEA.L	EXPONENTE(A6),A5
+  180   000138   1A87                			MOVE.B	D7,(A5)
+  181   00013A   4CDF 20F0           			MOVEM.L	(SP)+,A5/D4/D5/D6/D7
+  182   00013E   4E5E                	                UNLK    A6
+  183   000140   4E75                			RTS
+  184                                	**********************
+  185                                	*
+  186                                	* PROCEDIMIENTO PARA COMPONER UN NUMERO EN IEEE 754 DE PRECISIÓN SIMPLE
+  187                                	* EN NOTACIÓN COMPACTA HEXADECIMAL A PARTIR DE SUS CAMPOS DE MANTISA Y EXPONENTE
+  188                                	*
+  189                                	**********************
+  190                                	* Argumentos
+  191                                	*   1: conjunto signo-mantisa en módulo y signo (4 octetos)
+  192                                	*   2: exponente en exceso a 127 (1 octeto más otro de sobra)
+  193                                	*   3: dirección donde se almacenará el número en binario con todos sus campos (4 octetos)
+  194                                	**********************
+  195                                	* La mantisa ocupará 32 bits, y estará en la forma s0X'bbbbbbb...b, donde
+  196                                	*     s es el bit de signo
+  197                                	*     X es el bit de la parte entera (si la mantisa está normalizada, X=1;
+  198                                	*                                     si está sin normalizar, X=0)
+  199                                	*     Hay 29 dígitos fraccionarios
+  200                                	* Esta rutina hace truncamiento, así que si se pretende hacer redondeo al más próximo,
+  201                                	* habrá que modificarla o bien pasar una mantisa previamente redondeada
+  202                                	* Se supone que los datos en la mantisa y en el exponente son correctos y no se
+  203                                	* comprueban casos especiales
+  204                                	**********************
+  Thu Sep 11 2003 00:14                                                                                                  Page    5
+
+
+
+
+  205            0000 0142           	FMERGES		EQU	*
+  206            0000 000E           	MANTISA		SET	14
+  207            0000 000C           	EXPONENTE	SET	12
+  208            0000 0008           	COMPACTO	SET	8
+  209   000142   4E56 0000           			LINK	A6,#0
+  210   000146   48E7 0704           			MOVEM.L	A5/D5/D6/D7,-(SP)
+  211                                	* Copiar exponente en D6 (le sobra el octeto más significativo)
+  212   00014A   4286                	                CLR.L   D6
+  213   00014C   1C2E 000D           			MOVE.B	EXPONENTE+1(A6),D6
+  214                                	* Desplazar el exponente a la izquierda para colocarlo en su sitio
+  215   000150   7A17                			MOVE.L	#23,D5
+  216   000152   EBAE                			LSL.L	D5,D6
+  217                                	* Copiar mantisa en D7
+  218   000154   2E2E 000E           			MOVE.L	MANTISA(A6),D7
+  219                                	* Desplazar aritméticamente la mantisa a la derecha para colocarla en su sitio
+  220   000158   EC87                			ASR.L	#6,D7
+  221                                	* Limpiar en la mantisa los bits que corresponden al exponente
+  222   00015A   0287 807F FFFF      			ANDI.L	#$807FFFFF,D7
+  223                                	* Unir mantisa y exponente
+  224   000160   8E86                			OR.L	D6,D7
+  225                                	* Almacenar resultado
+  226   000162   2A6E 0008           			MOVEA.L	COMPACTO(A6),A5
+  227   000166   2A87                			MOVE.L	D7,(A5)
+  228                                	
+  229                                	* Salir
+  230   000168   4CDF 20E0           			MOVEM.L	(SP)+,A5/D5/D6/D7
+  231   00016C   4E5E                			UNLK	A6
+  232   00016E   4E75                			RTS
+  233                                	**********************
+  234                                	*
+  235                                	* SUBRUTINAS AUXILIARES:
+  236                                	* ======================
+  237                                	***********************
+  238            0000 0170           	MS_C2_B		EQU	*
+  239   000170   4A81                	                TST.L   D1
+  240   000172   6C00 000A           	                BGE     ESPOS		Si el numero es positivo, no hace falta cambiarlo.
+  241   000176   4481                	                NEG.L   D1             	Si no hay que hacer el C2 del numero
+  242   000178   0A81 8000 0000      	                EOR.L   #$80000000,D1	Y después invertir del bit de signo con una máscara 
+                                                de bits
+  243            0000 017E           	ESPOS		EQU	*
+  244   00017E   4E75                	FIN_M2_C2_B     RTS
+  245                                	******************************
+  246            0000 0180           	E127_C2_B	EQU	*
+  247   000180   5202                	                ADDQ.B  #1,D2		Primero le sumamos uno para que esté en exceso a 128
+                                                
+  248   000182   0A02 0080           	                EOR.B   #$80,D2		Cambiamos el bit más signficativo, ya lo tenemos en 
+                                                C2
+  249   000186   4882                	                EXT.W   D2		Realizamos una extensión de signo
+  250   000188   4E75                			RTS    
+  251                                	**************************
+  252            0000 018A           	C2_E127_B	EQU	*
+  253   00018A                       	            
+  254   00018A   0A02 0080           	                EOR.B   #$80,D2        	Invertimos el bit más significativo mediante una más
+                                                cara de bits
+  255   00018E   5302                	                SUB.B   #1,D2          	Le restamos uno al exponente
+  256   000190   4E75                			RTS
+  257                                	****************************
+  Thu Sep 11 2003 00:14                                                                                                  Page    6
+
+
+
+
+  258            0000 0192           	NORM_MANT_L	EQU	*
+  259   000192   48E7 9000           	                MOVEM.L D3/D0,-(SP)    	Salvaguardamos los registros
+  260   000196   4EB9 0000 0238      	                JSR     SALV_SIGN_L     Llamamos a SALV_SIGN_L
+  261                                	
+  262                                	* Comprobación de si la mantisa son todo ceros
+  263   00019C   4A81                	                TST.L   D1             
+  264   00019E   6700 0030           	                BEQ     TODO_CERO      	Si es todo ceros, saltamos
+  265                                	
+  266   0001A2   0801 001E           	                BTST    #30,D1         	Si no, miramos el bit 30 de la mantisa
+  267   0001A6   6600 0038           	                BNE     DESP_DRCHA     	Si es distinto de 0, a DESP_DRCHA
+  268   0001AA   0801 001D           	                BTST    #29,D1         	Ahora testeamos el bit29
+  269   0001AE   6600 0034           	                BNE     FIN_NORM       	Si es <>, ya está normalizado. Si no, hay que encont
+                                                rar el bit
+  270   0001B2   4283                	                CLR.L   D3             	Borramos D3
+  271   0001B4   701C                	                MOVE.L  #28,D0          
+  272   0001B6   5203                	ENCONTRAR_BIT   ADDI.B  #1,D3           En D3 guardamos el desplaz_izdo
+  273   0001B8   0101                	                BTST    D0,D1         	Testeamos el bit de la mantisa
+  274   0001BA   6700 0010           	                BEQ     NO_ENCONT_BIT  	Si es igual, saltamos a NO_ENCONT_BIT
+  275   0001BE   9443                	                SUB.W   D3,D2          	Restamos al exponente D3
+  276   0001C0   5343                	                SUB.W   #1,D3         	Restamos 1 al desplaz_izdo 
+  277   0001C2   E389                	DESP_IZQ        LSL.L   D1             	Desp_lógico de la mantisa a la izda.
+  278   0001C4   51CB FFFC           	                DBF     D3,DESP_IZQ     Decrementamos D3, y saltamos a DESP_IZQ 
+  279   0001C8   6000 001A           	                BRA     FIN_NORM        Saltamos a FIN_NORM
+  280   0001CC   51C8 FFE8           	NO_ENCONT_BIT   DBF     D0,ENCONTRAR_BIT Decrementamos D0, y salto a ENCONTRAR_BIT
+  281                                	
+  282            0000 01D0           	TODO_CERO       EQU	*
+  283   0001D0   0C42 FF80           			CMPI.W  #$FF80,D2       Comprobamos si se trata de un infinito
+  284   0001D4   6700 000E           	                BEQ     FIN_NORM        Si lo es, saltamos a FIN_NORM
+  285   0001D8   343C FF81           	                MOVE.W  #$FF81,D2      	Si no, poner 0 en exponente
+  286   0001DC   6000 0006           	                BRA     FIN_NORM        Y saltamos a FIN_NORM
+  287                                	
+  288            0000 01E0           	DESP_DRCHA      EQU	*
+  289   0001E0   5242                			ADD.W  #1,D2           	Sumamos 1 al exponente. 
+  290   0001E2   E289                	                LSR.L   D1              Desplazamiento a la derecha d la mantisa
+  291                                	
+  292            0000 01E4           	FIN_NORM        EQU  	*
+  293   0001E4   4882                			EXT.W   D2             	Extensión de signo del exponente
+  294   0001E6   0C42 FF80           	                CMP.W  #$FF80,D2      	Si se produjo algún desbordamiento, como infinito. A
+                                                NTES CMPI
+  295   0001EA   6E00 0008           	                BGT     FIN_NORM2       
+  296   0001EE   4281                	                CLR.L   D1              Borramos D1
+  297   0001F0   343C FF80           	                MOVE.W  #$FF80,D2      
+  298   0001F4   4EB9 0000 0252      	FIN_NORM2       JSR     RES_SIG_L      	LLamar a RES_SIG_L
+  299   0001FA   4CDF 0009           	                MOVEM.L (SP)+,D3/D0    	Restauración de los registros
+  300   0001FE   4E75                	            	RTS
+  301                                	**************************
+  302            0000 0200           	ROUND_MANT_L	EQU	*
+  303   000200   48E7 8000           	                MOVEM.L D0,-(SP)        Salvaguardamos el registro en la pila
+  304   000204   2001                	                MOVE.L  D1,D0           La mantisa a D0
+  305   000206   0280 0000 003F      	                ANDI.L  #$0000003F,D0   Borramos los bits del 6 al 32, con una máscara de bi
+                                                ts
+  306   00020C   0C40 0020           	                CMP     #%100000,D0     Comparamos D0 con el binario 100000
+  307   000210   6500 0020           	                BLO     NO_REDOND       Si es menor, saltamos a NO_REDOND
+  308   000214   6200 000A           	                BHI     REDOND          Si es mayor, saltamos a REDOND
+  309   000218   0801 0006           	                BTST    #6,D1           Testeamos el bit 6 de la mantisa
+  310   00021C   6700 0014           	                BEQ     NO_REDOND       Si es igual a 0, saltamos a NO_REDON
+  311            0000 0220           	REDOND	        EQU	*
+  Thu Sep 11 2003 00:14                                                                                                  Page    7
+
+
+
+
+  312   000220   0681 0000 0040      			ADDI.L  #$00000040,D1   Si no, hay que sumar $00000040 a la mantisa
+  313   000226   0281 FFFF FFC0      	                ANDI.L  #$FFFFFFC0,D1   Poner a 0 los bits de redondeo
+  314   00022C   4EB9 0000 0192      	                JSR     NORM_MANT_L     Y comprobar que no se haya desnormalizado
+  315                                	
+  316            0000 0232           	NO_REDOND       EQU	*
+  317   000232   4CDF 0001           			MOVEM.L (SP)+,D0        Recuperación de los registros
+  318   000236   4E75                			RTS
+  319                                	********************
+  320            0000 0238           	SALV_SIGN_L       EQU     *
+  321                                	                * USAMOS EL BIT + SIGNIFICATIVO DE D2 (4 OCTETOS), PARA
+  322                                	                * GUARDAR EL BIT DE SIGNO
+  323   000238   0801 001F           	                BTST    #31,D1          Testear el bit 31 de la mantisa
+  324   00023C   6600 000A           	                BNE     NEGAT           Si es <> 0, es negativo
+  325   000240   0882 001F           	                BCLR    #31,D2          Si no, ponemos a 0 el bit 31 de D2
+  326   000244   6000 0006           	                BRA     BORRA_BIT_SIG   Saltamos a BORRA_BIT_SIG
+  327            0000 0248           	NEGAT	        EQU	*
+  328   000248   08C2 001F           			BSET    #31,D2          Ponemos a 1 el bit 31 de D2
+  329                                	
+  330            0000 024C           	BORRA_BIT_SIG 	EQU	*
+  331   00024C   0881 001F           			BCLR    #31,D1          Ponemos a 0 el bit 31 de la mantisa
+  332   000250   4E75                			RTS
+  333                                	***************************
+  334            0000 0252           	RES_SIG_L	EQU	*
+  335   000252   0802 001F           	                BTST    #31,D2          Ponemos a 1 el bit 1 de D2
+  336   000256   6600 000A           	                BNE     RES_NEGAT       Si es distinto, saltar a RES_NEGAT
+  337   00025A   0881 001F           	                BCLR    #31,D1          Ponemos a 0 el bit 31 de la mantisa
+  338   00025E   6000 0006           	                BRA     LIMP_D2      	Y saltamos a LIMP_D2
+  339            0000 0262           	RES_NEGAT      	EQU	*
+  340   000262   08C1 001F           			BSET    #31,D1         Ponemos a 1 el bit d la mantisa
+  341                                	
+  342            0000 0266           	LIMP_D2      	EQU	*
+  343   000266   0282 0000 FFFF      			ANDI.L  #$0000FFFF,D2   	Y borramos el bit de de signo
+  344                                	
+  345   00026C   4E75                	            	RTS
+  346   00026E                       	            	END
+
+
+
+           Lines Assembled :  346             Assembly Errors :  0
+
+
+

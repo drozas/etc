@@ -1,0 +1,81 @@
+[project]
+name=prac4b
+netlist=prac4b
+contents=prac4b
+date=02/25/03
+time=17:35:40
+version=3.1.4.05.97
+generics=MAX
+Type=XILINX8
+top_level=schematic
+library_net=ON
+sim_mode=FUNC
+lib_order=1022 133 153
+
+[libraries]
+1022= 
+133=f:\fndtn\active\syslib\simprims
+153=f:\fndtn\active\syslib\xc4000e
+
+[xilinx]
+libraries=unified
+family=2
+xact8=On
+xfam=XC4000E
+
+[device]
+xilinx=4003EPC84-1
+part=4003EPC84-1
+
+[ext_sheets]
+prac4b.ucf=
+
+[netlist]
+external=FALSE
+
+[Schematic]
+Table01=Project
+Table02=Sheet
+Table03=Date
+
+[sheets]
+prac4b1=
+
+[APP_95]
+lid=0
+oid=0
+source=D:\PRACETC\PRAC4\PRAC4B\PRAC4B1.SCH
+
+[Log]
+netlist.log=Simulator Netlist Log
+
+[sim_config]
+Lower Bound=2048
+Upper Bound=2048
+B0 Period=50
+Transport Delay=On
+Enable Global Netlist Analysis=On
+Forced State=Default
+Output Waveform=Overwrite
+Global Reset=On
+Keep Comments=Off
+Execute Preset=Off
+Models Stabilization=On
+Pulse Global Reset Net Enabled=On
+Pulse Global Reset Net=1000
+
+[timings]
+prac4b=
+
+[FILE7]
+scan_time=1046227978
+
+[OPEN32]
+nMaxFile=255
+lpstrFile=
+lpstrFilter=Schematic (*.SCH)|*.sch|All Files (*.*)|*.*||
+lpstrInitialDir=F:\DOCUME~1\DAVID\MISDOC~1\ESTRUC~1\PRACTI~2\XILINX\PRAC4\PRAC4B\
+lpstrTitle=Select Schematic Sheet
+nFilterIndex=1
+Flags=6148
+cmdLine=-h 1134 -hp 808 -m PCM_OPEN_32_MESSAGE -f F:\FNDTN\ACTIVE\PROJECTS\current.pdf
